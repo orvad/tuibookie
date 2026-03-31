@@ -13,10 +13,12 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyPressMsg:
 		if msg.String() == "esc" {
 			switch m.formAction {
-			case formAddCategory:
+			case formAddCategory, formEditCategory:
 				m.currentView = categoryView
 			case formAddBookmark, formEditBookmark:
 				m.currentView = bookmarkView
+			case formImport, formImportManual:
+				m.currentView = settingsView
 			}
 			m.form = nil
 			return m, nil
@@ -29,34 +31,86 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	if m.form.State == huh.StateCompleted {
+		name := m.form.GetString("name")
+		cmd := m.form.GetString("cmd")
+
 		switch m.formAction {
 		case formAddCategory:
-			if m.formName != "" {
-				bookmark.AddCategory(m.bookmarks, m.formName)
+			if name != "" {
+				bookmark.AddCategory(m.bookmarks, name)
+				m.refreshCategories()
+				m.save()
+				m.selectedCat = name
+				m.bmCursor = 0
+				m.currentView = bookmarkView
+			} else {
+				m.currentView = categoryView
+			}
+
+		case formEditCategory:
+			if name != "" {
+				oldName := m.categories[m.catCursor]
+				bookmark.RenameCategory(m.bookmarks, oldName, name)
 				m.refreshCategories()
 				m.save()
 			}
 			m.currentView = categoryView
 
 		case formAddBookmark:
-			if m.formName != "" && m.formCmd != "" {
+			if name != "" && cmd != "" {
 				bookmark.AddBookmark(m.bookmarks, m.selectedCat, bookmark.Bookmark{
-					Name: m.formName,
-					Cmd:  m.formCmd,
+					Name: name,
+					Cmd:  cmd,
 				})
 				m.save()
 			}
 			m.currentView = bookmarkView
 
 		case formEditBookmark:
-			if m.formName != "" && m.formCmd != "" {
+			if name != "" && cmd != "" {
 				bookmark.UpdateBookmark(m.bookmarks, m.selectedCat, m.editIndex, bookmark.Bookmark{
-					Name: m.formName,
-					Cmd:  m.formCmd,
+					Name: name,
+					Cmd:  cmd,
 				})
 				m.save()
 			}
 			m.currentView = bookmarkView
+
+		case formImport:
+			path := m.form.GetString("path")
+			if path == "" {
+				// User chose "Enter path manually..."
+				m.form = huh.NewForm(
+					huh.NewGroup(
+						huh.NewInput().
+							Title("Path to JSON file").
+							Key("path"),
+					),
+				)
+				m.formAction = formImportManual
+				return m, m.form.Init()
+			}
+			if err := bookmark.Import(path, m.bookmarks); err != nil {
+				m.statusMsg = "Import failed: " + err.Error()
+			} else {
+				m.refreshCategories()
+				m.save()
+				m.statusMsg = "Imported from " + path
+			}
+			m.currentView = settingsView
+
+		case formImportManual:
+			path := m.form.GetString("path")
+			if path != "" {
+				if err := bookmark.Import(path, m.bookmarks); err != nil {
+					m.statusMsg = "Import failed: " + err.Error()
+				} else {
+					m.refreshCategories()
+					m.save()
+					m.statusMsg = "Imported from " + path
+				}
+			}
+			m.currentView = settingsView
 		}
 		m.form = nil
 	}
@@ -68,5 +122,5 @@ func (m Model) viewForm() string {
 	if m.form == nil {
 		return ""
 	}
-	return m.form.View()
+	return titleStyle.Render("SSH Bookmarks") + "\n\n" + m.form.View()
 }

@@ -13,8 +13,9 @@ import (
 func (m Model) updateCategory(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyPressMsg:
+		m.statusMsg = ""
 		switch msg.String() {
-		case "ctrl+c", "q":
+		case "ctrl+c", "q", "esc":
 			return m, tea.Quit
 		case "up", "k":
 			if m.catCursor > 0 {
@@ -24,24 +25,38 @@ func (m Model) updateCategory(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.catCursor < len(m.categories)-1 {
 				m.catCursor++
 			}
-		case "enter":
+		case "enter", "right", "l":
 			if len(m.categories) > 0 {
 				m.selectedCat = m.categories[m.catCursor]
 				m.bmCursor = 0
 				m.currentView = bookmarkView
 			}
 		case "a":
-			m.formName = ""
 			m.formAction = formAddCategory
 			m.form = huh.NewForm(
 				huh.NewGroup(
 					huh.NewInput().
 						Title("Category name").
-						Value(&m.formName),
+						Key("name"),
 				),
 			)
 			m.currentView = formView
 			return m, m.form.Init()
+		case "e":
+			if len(m.categories) > 0 {
+				editCatName := m.categories[m.catCursor]
+				m.formAction = formEditCategory
+				m.form = huh.NewForm(
+					huh.NewGroup(
+						huh.NewInput().
+							Title("Rename category").
+							Key("name").
+							Value(&editCatName),
+					),
+				)
+				m.currentView = formView
+				return m, m.form.Init()
+			}
 		case "d":
 			if len(m.categories) > 0 {
 				cat := m.categories[m.catCursor]
@@ -52,6 +67,10 @@ func (m Model) updateCategory(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.catCursor--
 				}
 			}
+		case "s":
+			m.settingsCursor = 0
+			m.statusMsg = ""
+			m.currentView = settingsView
 		}
 	}
 	return m, nil
@@ -81,7 +100,7 @@ func (m Model) viewCategory() string {
 	}
 
 	b.WriteString("\n")
-	b.WriteString(helpStyle.Render("[a]dd  [d]elete  [enter] open  [q]uit"))
+	b.WriteString(helpStyle.Render("[a]dd  [e]dit  [d]elete  [s]ettings  [enter/→] open  [q/esc] quit"))
 
 	return b.String()
 }

@@ -18,7 +18,7 @@ func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "ctrl+c", "q":
 			return m, tea.Quit
-		case "esc":
+		case "esc", "left", "h":
 			m.currentView = categoryView
 			m.bmCursor = 0
 		case "up", "k":
@@ -41,18 +41,15 @@ func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		case "a":
-			m.formName = ""
-			m.formCmd = ""
 			m.formAction = formAddBookmark
 			m.form = huh.NewForm(
 				huh.NewGroup(
 					huh.NewInput().
 						Title("Bookmark name").
-						Value(&m.formName),
+						Key("name"),
 					huh.NewInput().
 						Title("SSH command").
-						Placeholder("ssh user@host").
-						Value(&m.formCmd),
+						Key("cmd"),
 				),
 			)
 			m.currentView = formView
@@ -60,18 +57,20 @@ func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "e":
 			if len(items) > 0 {
 				bm := items[m.bmCursor]
-				m.formName = bm.Name
-				m.formCmd = bm.Cmd
+				editName := bm.Name
+				editCmd := bm.Cmd
 				m.editIndex = m.bmCursor
 				m.formAction = formEditBookmark
 				m.form = huh.NewForm(
 					huh.NewGroup(
 						huh.NewInput().
 							Title("Bookmark name").
-							Value(&m.formName),
+							Key("name").
+							Value(&editName),
 						huh.NewInput().
 							Title("SSH command").
-							Value(&m.formCmd),
+							Key("cmd").
+							Value(&editCmd),
 					),
 				)
 				m.currentView = formView
@@ -93,7 +92,9 @@ func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Model) viewBookmark() string {
 	var b strings.Builder
 
-	b.WriteString(titleStyle.Render(m.selectedCat))
+	b.WriteString(titleStyle.Render("SSH Bookmarks"))
+	b.WriteString("\n\n")
+	b.WriteString(selectedStyle.Render(m.selectedCat))
 	b.WriteString("\n\n")
 
 	items := m.bookmarks[m.selectedCat]
@@ -113,7 +114,7 @@ func (m Model) viewBookmark() string {
 	}
 
 	b.WriteString("\n")
-	b.WriteString(helpStyle.Render("[a]dd  [e]dit  [d]elete  [enter] connect  [esc] back  [q]uit"))
+	b.WriteString(helpStyle.Render("[a]dd  [e]dit  [d]elete  [enter] connect  [←/esc] back  [q]uit"))
 
 	return b.String()
 }

@@ -1,0 +1,6 @@
+.claude/
+*-backup-*.json
+*.log
+*.tmp
+*.cache
+*.bak

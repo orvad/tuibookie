@@ -12,6 +12,7 @@ type view int
 const (
 	categoryView view = iota
 	bookmarkView
+	settingsView
 	formView
 )
 
@@ -19,8 +20,11 @@ type formAction int
 
 const (
 	formAddCategory formAction = iota
+	formEditCategory
 	formAddBookmark
 	formEditBookmark
+	formImport
+	formImportManual
 )
 
 type Model struct {
@@ -33,14 +37,13 @@ type Model struct {
 	bmCursor    int
 	form        *huh.Form
 	formAction  formAction
-	editIndex   int
-	err         error
+	editIndex      int
+	settingsCursor int
+	err            error
+	statusMsg      string
 	width       int
 	height      int
 
-	// form field bindings
-	formName string
-	formCmd  string
 }
 
 func NewModel(bm bookmark.Bookmarks, configPath string) Model {
@@ -75,6 +78,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.updateCategory(msg)
 	case bookmarkView:
 		return m.updateBookmark(msg)
+	case settingsView:
+		return m.updateSettings(msg)
 	case formView:
 		return m.updateForm(msg)
 	}
@@ -89,6 +94,8 @@ func (m Model) View() tea.View {
 		v = tea.NewView(m.viewCategory())
 	case bookmarkView:
 		v = tea.NewView(m.viewBookmark())
+	case settingsView:
+		v = tea.NewView(m.viewSettings())
 	case formView:
 		v = tea.NewView(m.viewForm())
 	default:
