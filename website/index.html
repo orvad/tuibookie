@@ -167,11 +167,6 @@
       padding: 4px;
     }
 
-    .terminal-body img {
-      width: 100%;
-      display: block;
-      border-radius: 0 0 8px 8px;
-    }
 
     /* Screenshots */
     .screenshots {
@@ -190,16 +185,59 @@
       max-width: 300px;
     }
 
-    .screenshot-item .terminal-body img {
-      aspect-ratio: 4 / 3;
-      object-fit: cover;
-      object-position: top;
-    }
-
     .screenshot-caption {
       margin-top: 10px;
       font-size: 13px;
       color: var(--help);
+    }
+
+    /* TUI Simulation */
+    .tui {
+      background: var(--bg);
+      padding: 16px 20px;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--muted);
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tui-badge {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--text);
+      padding: 1px 8px;
+      border-radius: 3px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .tui-heading {
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .tui-selected {
+      color: var(--green);
+    }
+
+    .tui-cmd {
+      color: var(--help);
+      margin-left: 2px;
+    }
+
+    .tui-help {
+      color: var(--help);
+      font-size: 11px;
+      margin-top: auto;
+      padding-top: 12px;
+    }
+
+    .tui-help span {
+      color: var(--yellow);
     }
 
     /* Features */
@@ -397,7 +435,16 @@
             <span class="terminal-title">/tuibookie</span>
           </div>
           <div class="terminal-body">
-            <img src="assets/screenshot-01.png" alt="TuiBookie categories view">
+            <div class="tui">
+              <div><span class="tui-badge">TuiBookie.dev</span></div>
+              <div class="tui-selected">&gt; Deployments (3)</div>
+              <div>&nbsp; Docker (4)</div>
+              <div>&nbsp; Kubernetes (3)</div>
+              <div>&nbsp; Monitoring (2)</div>
+              <div>&nbsp; Production Servers (3)</div>
+              <div>&nbsp; Staging Servers (2)</div>
+              <div class="tui-help"><span>[a]</span>dd <span>[e]</span>dit <span>[d]</span>elete <span>[s]</span>ettings <span>[enter/&rarr;]</span> open <span>[q/esc]</span> quit</div>
+            </div>
           </div>
         </div>
       </div>
@@ -416,7 +463,16 @@
               <div class="terminal-dot green"></div>
             </div>
             <div class="terminal-body">
-              <img src="assets/screenshot-01.png" alt="Categories view">
+              <div class="tui">
+                <div><span class="tui-badge">TuiBookie.dev</span></div>
+                <div class="tui-selected">&gt; Deployments (3)</div>
+                <div>&nbsp; Docker (4)</div>
+                <div>&nbsp; Kubernetes (3)</div>
+                <div>&nbsp; Monitoring (2)</div>
+                <div>&nbsp; Production Servers (3)</div>
+                <div>&nbsp; Staging Servers (2)</div>
+                <div class="tui-help"><span>[a]</span>dd <span>[e]</span>dit <span>[d]</span>elete <span>[s]</span>ettings <span>[enter/&rarr;]</span> open <span>[q/esc]</span> quit</div>
+              </div>
             </div>
           </div>
           <div class="screenshot-caption">Browse categories</div>
@@ -429,7 +485,15 @@
               <div class="terminal-dot green"></div>
             </div>
             <div class="terminal-body">
-              <img src="assets/screenshot-02.png" alt="Bookmarks view">
+              <div class="tui">
+                <div><span class="tui-badge">TuiBookie.dev</span></div>
+                <div class="tui-heading">Docker</div>
+                <div class="tui-selected">&gt; Clean up <span class="tui-cmd">docker system prune -af</span></div>
+                <div>&nbsp; Follow logs <span class="tui-cmd">docker compose logs -f</span></div>
+                <div>&nbsp; Start stack <span class="tui-cmd">docker compose up -d</span></div>
+                <div>&nbsp; Stop stack <span class="tui-cmd">docker compose down</span></div>
+                <div class="tui-help"><span>[a]</span>dd <span>[e]</span>dit <span>[d]</span>elete <span>[enter]</span> run <span>[&larr;/esc]</span> back <span>[q]</span>uit</div>
+              </div>
             </div>
           </div>
           <div class="screenshot-caption">Run bookmarked commands</div>
@@ -442,7 +506,13 @@
               <div class="terminal-dot green"></div>
             </div>
             <div class="terminal-body">
-              <img src="assets/screenshot-03.png" alt="Settings view">
+              <div class="tui">
+                <div><span class="tui-badge">TuiBookie.dev</span></div>
+                <div class="tui-heading">Settings</div>
+                <div class="tui-selected">&gt; Export bookmarks</div>
+                <div>&nbsp; Import bookmarks</div>
+                <div class="tui-help"><span>[enter/&rarr;]</span> select <span>[&larr;/esc]</span> back <span>[q]</span> quit</div>
+              </div>
             </div>
           </div>
           <div class="screenshot-caption">Import &amp; export backups</div>
