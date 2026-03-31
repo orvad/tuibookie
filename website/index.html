@@ -312,6 +312,65 @@
       font-size: 13px;
       border-top: 1px solid var(--border);
     }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero {
+        flex-direction: column;
+        padding: 48px 0 40px;
+        gap: 32px;
+      }
+
+      .hero h1 {
+        font-size: 32px;
+      }
+
+      .hero .tagline {
+        font-size: 16px;
+      }
+
+      .hero-screenshot {
+        max-width: 100%;
+      }
+
+      .install-cmd {
+        font-size: 12px;
+        flex-wrap: wrap;
+      }
+
+      .screenshot-row {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .screenshot-item {
+        max-width: 100%;
+      }
+
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .install-methods {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .install-method {
+        max-width: 100%;
+        width: 100%;
+      }
+
+      .section-title {
+        font-size: 22px;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
   </style>
 </head>
 <body>
