@@ -7,7 +7,6 @@ bookmark*.json
 *.tmp
 *.cache
 *.bak
-
 tuibookie
 
 # wrangler files
