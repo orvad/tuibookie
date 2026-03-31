@@ -6,7 +6,7 @@
 
 <p align="center">
   A fast, interactive terminal bookmark manager for CLI commands.<br>
-  Organize your frequently used commands into categories, browse them with an intuitive TUI, and execute with a single keypress.
+  Organize your frequently used commands into categories, browse them with an intuitive Terminal User Interface, and execute with a single keypress.
 </p>
 
 Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea), [Huh](https://github.com/charmbracelet/huh), and [Lip Gloss](https://github.com/charmbracelet/lipgloss) from the Charm ecosystem.
