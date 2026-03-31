@@ -7,16 +7,16 @@ import (
 
 	tea "charm.land/bubbletea/v2"
 
-	"example/go-ssh/internal/bookmark"
-	"example/go-ssh/internal/config"
-	"example/go-ssh/internal/tui"
+	"example/tuibookie/internal/bookmark"
+	"example/tuibookie/internal/config"
+	"example/tuibookie/internal/tui"
 )
 
 func main() {
 	configFlag := flag.String("config", "", "path to bookmarks JSON file")
 	flag.Parse()
 
-	configPath := config.ResolvePath(*configFlag, os.Getenv("GO_SSH_CONFIG"))
+	configPath := config.ResolvePath(*configFlag, os.Getenv("TUIBOOKIE_CONFIG"))
 
 	if err := config.EnsureConfigDir(configPath); err != nil {
 		fmt.Fprintf(os.Stderr, "Error creating config directory: %v\n", err)

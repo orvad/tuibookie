@@ -29,7 +29,7 @@ func TestResolvePathFlagOverridesEnv(t *testing.T) {
 
 func TestResolvePathDefault(t *testing.T) {
 	home, _ := os.UserHomeDir()
-	expected := filepath.Join(home, ".config", "go-ssh", "bookmarks.json")
+	expected := filepath.Join(home, ".config", "tuibookie", "bookmarks.json")
 	path := ResolvePath("", "")
 	if path != expected {
 		t.Fatalf("expected %s, got %s", expected, path)

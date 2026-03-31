@@ -1,4 +1,4 @@
-module example/go-ssh
+module example/tuibookie
 
 go 1.26.1
 

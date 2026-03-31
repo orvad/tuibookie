@@ -4,7 +4,7 @@ import (
 	"charm.land/huh/v2"
 	tea "charm.land/bubbletea/v2"
 
-	"example/go-ssh/internal/bookmark"
+	"example/tuibookie/internal/bookmark"
 )
 
 type view int

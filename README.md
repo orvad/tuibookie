@@ -1,6 +1,6 @@
-# go-ssh
+# TuiBookie
 
-A terminal-based SSH bookmark manager built with Go. Organize your SSH connections into categories, browse them with an interactive TUI, and connect with a single keypress.
+A fast, interactive terminal bookmark manager for CLI commands. Organize your frequently used commands into categories, browse them with an intuitive TUI, and execute with a single keypress.
 
 Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea), [Huh](https://github.com/charmbracelet/huh), and [Lip Gloss](https://github.com/charmbracelet/lipgloss) from the Charm ecosystem.
 
@@ -8,11 +8,12 @@ Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea), [Huh](https
 
 - **Interactive TUI** — Navigate bookmarks and categories with arrow keys
 - **Category management** — Add, rename, and delete categories
-- **Bookmark management** — Add, edit, and delete SSH bookmarks within categories
-- **Instant connect** — Select a bookmark and connect via SSH immediately
+- **Bookmark management** — Add, edit, and delete command bookmarks within categories
+- **Instant execution** — Select a bookmark and run the command immediately
 - **Import/Export** — Back up your bookmarks to JSON and import from backup files
 - **Alphabetical sorting** — Categories and bookmarks are always sorted (case-insensitive)
 - **Configurable storage** — Choose where your bookmarks file lives
+- **Any CLI command** — SSH, rsync, docker, kubectl, or any command you use regularly
 
 ## Installation
 
@@ -24,18 +25,18 @@ Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea), [Huh](https
 
 ```bash
 git clone <repo-url>
-cd go-ssh
-go build -o go-ssh .
+cd tuibookie
+go build -o tuibookie .
 ```
 
-This produces a `go-ssh` binary in the current directory. Move it to a directory in your `$PATH` to use it from anywhere:
+This produces a `tuibookie` binary in the current directory. Move it to a directory in your `$PATH` to use it from anywhere:
 
 ```bash
 # Example: move to /usr/local/bin
-sudo mv go-ssh /usr/local/bin/
+sudo mv tuibookie /usr/local/bin/
 
 # Or to a user-local bin directory
-mv go-ssh ~/.local/bin/
+mv tuibookie ~/.local/bin/
 ```
 
 ### Cross-compilation
@@ -44,22 +45,22 @@ Build for a different platform:
 
 ```bash
 # Linux (amd64)
-GOOS=linux GOARCH=amd64 go build -o go-ssh .
+GOOS=linux GOARCH=amd64 go build -o tuibookie .
 
 # Linux (arm64)
-GOOS=linux GOARCH=arm64 go build -o go-ssh .
+GOOS=linux GOARCH=arm64 go build -o tuibookie .
 
 # macOS (Apple Silicon)
-GOOS=darwin GOARCH=arm64 go build -o go-ssh .
+GOOS=darwin GOARCH=arm64 go build -o tuibookie .
 
 # macOS (Intel)
-GOOS=darwin GOARCH=amd64 go build -o go-ssh .
+GOOS=darwin GOARCH=amd64 go build -o tuibookie .
 ```
 
 ## Usage
 
 ```bash
-go-ssh
+tuibookie
 ```
 
 ### Navigation
@@ -85,7 +86,7 @@ The app uses a stack-based navigation model. Use arrow keys or vim-style keys to
 |---|---|
 | `Up` / `k` | Move cursor up |
 | `Down` / `j` | Move cursor down |
-| `Enter` | Connect to selected bookmark via SSH |
+| `Enter` | Run the selected command |
 | `a` | Add a new bookmark |
 | `e` | Edit selected bookmark |
 | `d` | Delete selected bookmark |
@@ -122,21 +123,21 @@ Settings provides:
 By default, bookmarks are stored at:
 
 ```
-~/.config/go-ssh/bookmarks.json
+~/.config/tuibookie/bookmarks.json
 ```
 
 Override this with:
 
 ```bash
 # CLI flag (highest priority)
-go-ssh --config /path/to/bookmarks.json
+tuibookie --config /path/to/bookmarks.json
 
 # Environment variable
-export GO_SSH_CONFIG=/path/to/bookmarks.json
-go-ssh
+export TUIBOOKIE_CONFIG=/path/to/bookmarks.json
+tuibookie
 ```
 
-Priority order: `--config` flag > `GO_SSH_CONFIG` env var > default path.
+Priority order: `--config` flag > `TUIBOOKIE_CONFIG` env var > default path.
 
 The config directory and file are created automatically on first run.
 
@@ -146,7 +147,7 @@ The bookmarks file is plain JSON. Each key is a category name, and the value is 
 
 ```json
 {
-  "production": [
+  "servers": [
     {
       "cmd": "ssh deploy@10.0.1.50",
       "name": "deploy"
@@ -156,23 +157,35 @@ The bookmarks file is plain JSON. Each key is a category name, and the value is 
       "name": "root (custom port)"
     }
   ],
-  "staging": [
+  "docker": [
     {
-      "cmd": "ssh dev@staging.example.com",
-      "name": "dev"
+      "cmd": "docker compose up -d",
+      "name": "start stack"
+    },
+    {
+      "cmd": "docker compose logs -f",
+      "name": "follow logs"
+    }
+  ],
+  "misc": [
+    {
+      "cmd": "rsync -avz ./dist/ user@server:/var/www/",
+      "name": "deploy frontend"
+    },
+    {
+      "cmd": "kubectl get pods -n production",
+      "name": "check prod pods"
     }
   ]
 }
 ```
 
-The `cmd` field can be any valid SSH command, including flags like `-p` for custom ports, `-i` for identity files, etc.
-
-You can edit this file manually — the app will pick up changes on next launch.
+The `cmd` field can be any valid shell command. You can edit this file manually — the app will pick up changes on next launch.
 
 ## Project structure
 
 ```
-go-ssh/
+tuibookie/
   main.go                       Entry point, flag parsing, TUI launch
   internal/
     bookmark/
@@ -188,7 +201,7 @@ go-ssh/
       bookmarks.go               Bookmark list view and key handling
       forms.go                   Huh form handling (add/edit/import)
       settings.go                Settings view (import/export)
-      exec.go                    SSH execution message types
+      exec.go                    Command execution message types
 ```
 
 ## License

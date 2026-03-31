@@ -13,7 +13,7 @@ func ResolvePath(flagPath, envPath string) string {
 		return envPath
 	}
 	home, _ := os.UserHomeDir()
-	return filepath.Join(home, ".config", "go-ssh", "bookmarks.json")
+	return filepath.Join(home, ".config", "tuibookie", "bookmarks.json")
 }
 
 func EnsureConfigDir(path string) error {

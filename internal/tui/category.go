@@ -7,7 +7,7 @@ import (
 	"charm.land/huh/v2"
 	tea "charm.land/bubbletea/v2"
 
-	"example/go-ssh/internal/bookmark"
+	"example/tuibookie/internal/bookmark"
 )
 
 func (m Model) updateCategory(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -79,7 +79,7 @@ func (m Model) updateCategory(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Model) viewCategory() string {
 	var b strings.Builder
 
-	b.WriteString(titleStyle.Render("SSH Bookmarks"))
+	b.WriteString(titleStyle.Render("TuiBookie"))
 	b.WriteString("\n\n")
 
 	if len(m.categories) == 0 {

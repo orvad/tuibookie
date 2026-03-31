@@ -7,7 +7,7 @@ import (
 	"charm.land/huh/v2"
 	tea "charm.land/bubbletea/v2"
 
-	"example/go-ssh/internal/bookmark"
+	"example/tuibookie/internal/bookmark"
 )
 
 func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -48,7 +48,7 @@ func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
 						Title("Bookmark name").
 						Key("name"),
 					huh.NewInput().
-						Title("SSH command").
+						Title("Command").
 						Key("cmd"),
 				),
 			)
@@ -68,7 +68,7 @@ func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
 							Key("name").
 							Value(&editName),
 						huh.NewInput().
-							Title("SSH command").
+							Title("Command").
 							Key("cmd").
 							Value(&editCmd),
 					),
@@ -92,7 +92,7 @@ func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Model) viewBookmark() string {
 	var b strings.Builder
 
-	b.WriteString(titleStyle.Render("SSH Bookmarks"))
+	b.WriteString(titleStyle.Render("TuiBookie"))
 	b.WriteString("\n\n")
 	b.WriteString(selectedStyle.Render(m.selectedCat))
 	b.WriteString("\n\n")
@@ -114,7 +114,7 @@ func (m Model) viewBookmark() string {
 	}
 
 	b.WriteString("\n")
-	b.WriteString(helpStyle.Render("[a]dd  [e]dit  [d]elete  [enter] connect  [←/esc] back  [q]uit"))
+	b.WriteString(helpStyle.Render("[a]dd  [e]dit  [d]elete  [enter] run  [←/esc] back  [q]uit"))
 
 	return b.String()
 }

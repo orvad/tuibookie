@@ -4,7 +4,7 @@ import (
 	"charm.land/huh/v2"
 	tea "charm.land/bubbletea/v2"
 
-	"example/go-ssh/internal/bookmark"
+	"example/tuibookie/internal/bookmark"
 )
 
 func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -122,5 +122,5 @@ func (m Model) viewForm() string {
 	if m.form == nil {
 		return ""
 	}
-	return titleStyle.Render("SSH Bookmarks") + "\n\n" + m.form.View()
+	return titleStyle.Render("TuiBookie") + "\n\n" + m.form.View()
 }

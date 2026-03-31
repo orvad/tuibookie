@@ -8,7 +8,7 @@ import (
 	"charm.land/huh/v2"
 	tea "charm.land/bubbletea/v2"
 
-	"example/go-ssh/internal/bookmark"
+	"example/tuibookie/internal/bookmark"
 )
 
 var settingsOptions = []string{"Export bookmarks", "Import bookmarks"}
@@ -66,7 +66,7 @@ func (m Model) updateSettings(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Model) viewSettings() string {
 	var b strings.Builder
 
-	b.WriteString(titleStyle.Render("SSH Bookmarks"))
+	b.WriteString(titleStyle.Render("TuiBookie"))
 	b.WriteString("\n\n")
 	b.WriteString(normalStyle.Render("Settings"))
 	b.WriteString("\n\n")
