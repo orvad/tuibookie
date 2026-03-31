@@ -30,7 +30,7 @@ Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea), [Huh](https
 
 <img src="examples/screenshot-02.png" alt="Bookmark list" width="600">
 
-**Settings** — Export your bookmarks as a backup or import from a JSON file.
+**Settings** — Configure your bookmarks file path, export backups, or import from a JSON file.
 
 <img src="examples/screenshot-03.png" alt="Settings" width="600">
 
@@ -144,6 +144,7 @@ The app uses a stack-based navigation model. Use arrow keys or vim-style keys to
 
 Settings provides:
 
+- **Bookmarks file** — View and change the path to your bookmarks JSON file. When switching, you'll see a confirmation with the number of categories and bookmarks in the target file. If the file doesn't exist, you can create a new empty one.
 - **Export bookmarks** — Saves a backup to the current working directory as `bookmarks-backup-YYYY-MM-DD-HHMMSS.json`
 - **Import bookmarks** — Lists `.json` files in the current directory to choose from, or lets you enter a file path manually. Imported bookmarks are merged into existing categories.
 
@@ -157,6 +158,16 @@ Settings provides:
 
 ## Configuration
 
+### Config file
+
+On first launch, TuiBookie creates a config file at:
+
+```
+~/.config/tuibookie/config.json
+```
+
+This stores your app settings, starting with the bookmarks file path. You can change the bookmarks path directly from the Settings view in the TUI — no flags needed.
+
 ### Bookmarks file location
 
 By default, bookmarks are stored at:
@@ -165,7 +176,7 @@ By default, bookmarks are stored at:
 ~/.config/tuibookie/bookmarks.json
 ```
 
-Override this with:
+You can change this in the Settings view, or override with flags for scripting:
 
 ```bash
 # CLI flag (highest priority)
@@ -176,9 +187,9 @@ export TUIBOOKIE_CONFIG=/path/to/bookmarks.json
 tuibookie
 ```
 
-Priority order: `--config` flag > `TUIBOOKIE_CONFIG` env var > default path.
+Priority order: `--config` flag > `TUIBOOKIE_CONFIG` env var > `config.json` setting > default path.
 
-The config directory and file are created automatically on first run.
+The config directory and files are created automatically on first run.
 
 ### Bookmarks file format
 
