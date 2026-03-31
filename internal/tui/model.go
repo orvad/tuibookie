@@ -51,14 +51,13 @@ type Model struct {
 	bmCursor    int
 	form        *huh.Form
 	formAction  formAction
-	editIndex      int
-	settingsCursor int
+	editIndex         int
+	settingsCursor    int
 	err               error
 	statusMsg         string
 	pendingConfigPath string
-	width       int
-	height      int
-
+	width             int
+	height            int
 }
 
 func NewModel(bm bookmark.Bookmarks, configPath string, configDir string, pathSource PathSource, version string) Model {

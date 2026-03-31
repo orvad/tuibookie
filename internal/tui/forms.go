@@ -118,8 +118,9 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.currentView = settingsView
 
 		case formChangeBookmarksPath:
-			path := m.form.GetString("path")
+			path := m.pendingConfigPath
 			if path == "" || path == m.configPath {
+				m.pendingConfigPath = ""
 				m.currentView = settingsView
 				break
 			}
@@ -128,7 +129,6 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if err != nil {
 				if os.IsNotExist(err) {
 					// File doesn't exist — ask to create
-					m.pendingConfigPath = path
 					m.formAction = formConfirmBookmarksPath
 					m.form = huh.NewForm(
 						huh.NewGroup(
@@ -139,6 +139,7 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 					)
 					return m, m.form.Init()
 				}
+				m.pendingConfigPath = ""
 				m.statusMsg = "Invalid file: " + err.Error()
 				m.currentView = settingsView
 				break
@@ -149,7 +150,6 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 			for _, items := range bm {
 				totalBookmarks += len(items)
 			}
-			m.pendingConfigPath = path
 			m.formAction = formConfirmBookmarksPath
 			title := fmt.Sprintf("Switch to this file? (%d categories, %d bookmarks)", len(cats), totalBookmarks)
 			m.form = huh.NewForm(

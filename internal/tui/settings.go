@@ -48,12 +48,13 @@ func (m Model) updateSettings(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.statusMsg = "Path set via TUIBOOKIE_CONFIG env"
 				} else {
 					m.formAction = formChangeBookmarksPath
+					m.pendingConfigPath = m.configPath
 					m.form = huh.NewForm(
 						huh.NewGroup(
 							huh.NewInput().
 								Title("Bookmarks file path").
 								Key("path").
-								Value(&m.configPath),
+								Value(&m.pendingConfigPath),
 						),
 					)
 					m.currentView = formView
