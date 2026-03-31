@@ -6,12 +6,16 @@ import (
 	"path/filepath"
 )
 
-func ResolvePath(flagPath, envPath string) string {
+func ResolvePath(flagPath, envPath, configDir string) string {
 	if flagPath != "" {
 		return flagPath
 	}
 	if envPath != "" {
 		return envPath
+	}
+	cfg, err := LoadAppConfig(configDir)
+	if err == nil && cfg.BookmarksPath != "" {
+		return cfg.BookmarksPath
 	}
 	home, _ := os.UserHomeDir()
 	return filepath.Join(home, ".config", "tuibookie", "bookmarks.json")

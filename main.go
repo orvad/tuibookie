@@ -18,7 +18,8 @@ func main() {
 	configFlag := flag.String("config", "", "path to bookmarks JSON file")
 	flag.Parse()
 
-	configPath := config.ResolvePath(*configFlag, os.Getenv("TUIBOOKIE_CONFIG"))
+	configDir := config.ConfigDir()
+	configPath := config.ResolvePath(*configFlag, os.Getenv("TUIBOOKIE_CONFIG"), configDir)
 
 	if err := config.EnsureConfigDir(configPath); err != nil {
 		fmt.Fprintf(os.Stderr, "Error creating config directory: %v\n", err)

@@ -7,21 +7,21 @@ import (
 )
 
 func TestResolvePathFlag(t *testing.T) {
-	path := ResolvePath("/tmp/custom.json", "")
+	path := ResolvePath("/tmp/custom.json", "", t.TempDir())
 	if path != "/tmp/custom.json" {
 		t.Fatalf("expected /tmp/custom.json, got %s", path)
 	}
 }
 
 func TestResolvePathEnv(t *testing.T) {
-	path := ResolvePath("", "/tmp/env.json")
+	path := ResolvePath("", "/tmp/env.json", t.TempDir())
 	if path != "/tmp/env.json" {
 		t.Fatalf("expected /tmp/env.json, got %s", path)
 	}
 }
 
 func TestResolvePathFlagOverridesEnv(t *testing.T) {
-	path := ResolvePath("/tmp/flag.json", "/tmp/env.json")
+	path := ResolvePath("/tmp/flag.json", "/tmp/env.json", t.TempDir())
 	if path != "/tmp/flag.json" {
 		t.Fatalf("expected flag to override env, got %s", path)
 	}
@@ -30,9 +30,45 @@ func TestResolvePathFlagOverridesEnv(t *testing.T) {
 func TestResolvePathDefault(t *testing.T) {
 	home, _ := os.UserHomeDir()
 	expected := filepath.Join(home, ".config", "tuibookie", "bookmarks.json")
-	path := ResolvePath("", "")
+	path := ResolvePath("", "", t.TempDir())
 	if path != expected {
 		t.Fatalf("expected %s, got %s", expected, path)
+	}
+}
+
+func TestResolvePathFromConfig(t *testing.T) {
+	dir := t.TempDir()
+	cfg := AppConfig{BookmarksPath: "/tmp/from-config.json"}
+	if err := SaveAppConfig(dir, cfg); err != nil {
+		t.Fatal(err)
+	}
+	path := ResolvePath("", "", dir)
+	if path != "/tmp/from-config.json" {
+		t.Fatalf("expected /tmp/from-config.json, got %s", path)
+	}
+}
+
+func TestResolvePathFlagOverridesConfig(t *testing.T) {
+	dir := t.TempDir()
+	cfg := AppConfig{BookmarksPath: "/tmp/from-config.json"}
+	if err := SaveAppConfig(dir, cfg); err != nil {
+		t.Fatal(err)
+	}
+	path := ResolvePath("/tmp/flag.json", "", dir)
+	if path != "/tmp/flag.json" {
+		t.Fatalf("expected flag to override config, got %s", path)
+	}
+}
+
+func TestResolvePathEnvOverridesConfig(t *testing.T) {
+	dir := t.TempDir()
+	cfg := AppConfig{BookmarksPath: "/tmp/from-config.json"}
+	if err := SaveAppConfig(dir, cfg); err != nil {
+		t.Fatal(err)
+	}
+	path := ResolvePath("", "/tmp/env.json", dir)
+	if path != "/tmp/env.json" {
+		t.Fatalf("expected env to override config, got %s", path)
 	}
 }
 
