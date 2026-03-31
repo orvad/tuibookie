@@ -11,7 +11,16 @@ import (
 	"example/tuibookie/internal/bookmark"
 )
 
-var settingsOptions = []string{"Export bookmarks", "Import bookmarks"}
+// settingsItems are the selectable items in order. Section labels are rendered
+// separately in viewSettings and are not part of this list.
+var settingsItems = []string{
+	"Bookmarks file",
+	"Export bookmarks",
+	"Import bookmarks",
+}
+
+// sectionBreak is the index where the DATA section starts (after Config items).
+const sectionBreak = 1
 
 func (m Model) updateSettings(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
@@ -27,19 +36,37 @@ func (m Model) updateSettings(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.settingsCursor--
 			}
 		case "down", "j":
-			if m.settingsCursor < len(settingsOptions)-1 {
+			if m.settingsCursor < len(settingsItems)-1 {
 				m.settingsCursor++
 			}
 		case "enter", "right", "l":
 			switch m.settingsCursor {
-			case 0: // Export
+			case 0: // Bookmarks file
+				if m.pathSource == PathSourceFlag {
+					m.statusMsg = "Path set via --config flag"
+				} else if m.pathSource == PathSourceEnv {
+					m.statusMsg = "Path set via TUIBOOKIE_CONFIG env"
+				} else {
+					m.formAction = formChangeBookmarksPath
+					m.form = huh.NewForm(
+						huh.NewGroup(
+							huh.NewInput().
+								Title("Bookmarks file path").
+								Key("path").
+								Value(&m.configPath),
+						),
+					)
+					m.currentView = formView
+					return m, m.form.Init()
+				}
+			case 1: // Export
 				filename, err := bookmark.Export(m.bookmarks)
 				if err != nil {
 					m.statusMsg = "Export failed: " + err.Error()
 				} else {
 					m.statusMsg = "Exported to " + filename
 				}
-			case 1: // Import
+			case 2: // Import
 				m.formAction = formImport
 				jsonFiles := findJSONFiles()
 				options := make([]huh.Option[string], 0, len(jsonFiles)+1)
@@ -71,11 +98,31 @@ func (m Model) viewSettings() string {
 	b.WriteString(normalStyle.Render("  Settings"))
 	b.WriteString("\n\n")
 
-	for i, opt := range settingsOptions {
+	// CONFIG section
+	b.WriteString(dimStyle.Render("  CONFIG"))
+	b.WriteString("\n")
+	for i := 0; i < sectionBreak; i++ {
+		label := settingsItems[i]
+		if i == 0 {
+			label = "Bookmarks file: " + truncatePath(m.configPath, 40)
+		}
 		if i == m.settingsCursor {
-			b.WriteString(selectedStyle.Render("> " + opt))
+			b.WriteString(selectedStyle.Render("> " + label))
 		} else {
-			b.WriteString(normalStyle.Render("  " + opt))
+			b.WriteString(normalStyle.Render("  " + label))
+		}
+		b.WriteString("\n")
+	}
+
+	// DATA section
+	b.WriteString("\n")
+	b.WriteString(dimStyle.Render("  DATA"))
+	b.WriteString("\n")
+	for i := sectionBreak; i < len(settingsItems); i++ {
+		if i == m.settingsCursor {
+			b.WriteString(selectedStyle.Render("> " + settingsItems[i]))
+		} else {
+			b.WriteString(normalStyle.Render("  " + settingsItems[i]))
 		}
 		b.WriteString("\n")
 	}
@@ -90,6 +137,13 @@ func (m Model) viewSettings() string {
 	b.WriteString(renderHelp("[enter/→] select  [←/esc] back  [q] quit"))
 
 	return b.String()
+}
+
+func truncatePath(path string, maxLen int) string {
+	if len(path) <= maxLen {
+		return path
+	}
+	return "..." + path[len(path)-maxLen+3:]
 }
 
 func findJSONFiles() []string {

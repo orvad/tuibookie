@@ -25,6 +25,8 @@ const (
 	formEditBookmark
 	formImport
 	formImportManual
+	formChangeBookmarksPath
+	formConfirmBookmarksPath
 )
 
 type PathSource int
