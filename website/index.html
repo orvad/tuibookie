@@ -126,7 +126,7 @@
 
     .hero-screenshot {
       flex: 1;
-      max-width: 420px;
+      max-width: 480px;
     }
 
     /* Terminal Chrome */
@@ -176,13 +176,14 @@
 
     .screenshot-row {
       display: flex;
-      gap: 20px;
-      justify-content: center;
+      flex-direction: column;
+      gap: 24px;
+      align-items: center;
     }
 
     .screenshot-item {
-      flex: 1;
-      max-width: 300px;
+      width: 100%;
+      max-width: 560px;
     }
 
     .screenshot-caption {
@@ -375,11 +376,6 @@
       .install-cmd {
         font-size: 12px;
         flex-wrap: wrap;
-      }
-
-      .screenshot-row {
-        flex-direction: column;
-        align-items: center;
       }
 
       .screenshot-item {
