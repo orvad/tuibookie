@@ -289,8 +289,9 @@
 
     .install-methods {
       display: flex;
+      flex-direction: column;
       gap: 16px;
-      justify-content: center;
+      align-items: center;
       margin-top: 32px;
     }
 
@@ -299,8 +300,8 @@
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 20px 24px;
-      flex: 1;
-      max-width: 300px;
+      width: 100%;
+      max-width: 560px;
       text-align: left;
     }
 
@@ -316,6 +317,7 @@
       font-size: 13px;
       color: var(--green);
       word-break: break-all;
+      white-space: pre-line;
     }
 
     .install-method .copy-btn {
@@ -383,14 +385,8 @@
         grid-template-columns: 1fr;
       }
 
-      .install-methods {
-        flex-direction: column;
-        align-items: center;
-      }
-
       .install-method {
         max-width: 100%;
-        width: 100%;
       }
 
       .section-title {
@@ -538,7 +534,8 @@
       <div class="install-methods">
         <div class="install-method">
           <div class="method-label">Homebrew</div>
-          <code>brew install orvad/tuibookie/tuibookie</code>
+          <code>brew tap orvad/tuibookie
+brew install tuibookie</code>
           <button class="copy-btn" onclick="copyCmd(this)">Copy</button>
         </div>
         <div class="install-method">
