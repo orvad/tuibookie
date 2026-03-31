@@ -211,7 +211,7 @@
 
     /* TUI Simulation */
     .tui {
-      background: var(--bg);
+      background: #1A1A1A;
       padding: 16px 20px;
       font-family: var(--mono);
       font-size: 13px;
@@ -520,13 +520,18 @@
               <div class="tui">
                 <div><span class="tui-badge">TuiBookie.dev</span></div>
                 <div class="tui-heading">Settings</div>
-                <div class="tui-selected">&gt; Export bookmarks</div>
+                <div>&nbsp;</div>
+                <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--help)">CONFIG</div>
+                <div class="tui-selected">&gt; Bookmarks file: ~/.config/tuibookie/bookmarks.json</div>
+                <div>&nbsp;</div>
+                <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--help)">DATA</div>
+                <div>&nbsp; Export bookmarks</div>
                 <div>&nbsp; Import bookmarks</div>
                 <div class="tui-help"><span>[enter/&rarr;]</span> select <span>[&larr;/esc]</span> back <span>[q]</span> quit</div>
               </div>
             </div>
           </div>
-          <div class="screenshot-caption">Import &amp; export backups</div>
+          <div class="screenshot-caption">Configure bookmarks path, import &amp; export backups</div>
         </div>
       </div>
     </section>
@@ -572,7 +577,7 @@
         <div class="feature-card">
           <div class="feature-icon">~/.cfg</div>
           <h3>Configurable</h3>
-          <p>Custom storage path via --config flag or TUIBOOKIE_CONFIG env var.</p>
+          <p>Change your bookmarks file path right from Settings. Or use --config flag and env var for scripting.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon"><span style="color:var(--accent)">&#9632;</span><span style="color:var(--green)">&#9632;</span><span style="color:var(--yellow)">&#9632;</span><span style="color:var(--muted)">&#9632;</span><span style="color:var(--help)">&#9632;</span></div>
