@@ -9,16 +9,14 @@
   Organize your frequently used commands into categories, browse them with an intuitive Terminal User Interface, and execute with a single keypress.
 </p>
 
-Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea), [Huh](https://github.com/charmbracelet/huh), and [Lip Gloss](https://github.com/charmbracelet/lipgloss) from the Charm ecosystem.
-
 ## Features
 
+Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea), [Huh](https://github.com/charmbracelet/huh), and [Lip Gloss](https://github.com/charmbracelet/lipgloss) from the Charm ecosystem.
+
+
 - **Interactive TUI** — Navigate bookmarks and categories with arrow keys
-- **Category management** — Add, rename, and delete categories
-- **Bookmark management** — Add, edit, and delete command bookmarks within categories
-- **Instant execution** — Select a bookmark and run the command immediately
+- **Categories** — Add, rename, and delete categories
 - **Import/Export** — Back up your bookmarks to JSON and import from backup files
-- **Alphabetical sorting** — Categories and bookmarks are always sorted (case-insensitive)
 - **Configurable storage** — Choose where your bookmarks file lives
 - **Any CLI command** — SSH, rsync, docker, kubectl, or any command you use regularly
 
@@ -208,28 +206,6 @@ The bookmarks file is plain JSON. Each key is a category name, and the value is 
 ```
 
 The `cmd` field can be any valid shell command. You can edit this file manually — the app will pick up changes on next launch.
-
-## Project structure
-
-```
-tuibookie/
-  main.go                       Entry point, flag parsing, TUI launch
-  internal/
-    bookmark/
-      bookmark.go               Bookmark types, CRUD, import/export
-      bookmark_test.go           Tests for bookmark operations
-    config/
-      config.go                  Config path resolution
-      config_test.go             Tests for config resolution
-    tui/
-      model.go                   Bubble Tea model, routing, state
-      styles.go                  Lip Gloss style definitions (Monokai theme)
-      category.go                Category list view and key handling
-      bookmarks.go               Bookmark list view and key handling
-      forms.go                   Huh form handling (add/edit/import)
-      settings.go                Settings view (import/export)
-      exec.go                    Command execution message types
-```
 
 ## License
 
