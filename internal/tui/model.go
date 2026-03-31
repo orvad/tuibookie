@@ -83,15 +83,19 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) View() tea.View {
+	var v tea.View
 	switch m.currentView {
 	case categoryView:
-		return tea.NewView(m.viewCategory())
+		v = tea.NewView(m.viewCategory())
 	case bookmarkView:
-		return tea.NewView(m.viewBookmark())
+		v = tea.NewView(m.viewBookmark())
 	case formView:
-		return tea.NewView(m.viewForm())
+		v = tea.NewView(m.viewForm())
+	default:
+		v = tea.NewView("")
 	}
-	return tea.NewView("")
+	v.AltScreen = true
+	return v
 }
 
 func (m *Model) refreshCategories() {
