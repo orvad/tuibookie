@@ -223,4 +223,4 @@ The `cmd` field can be any valid shell command. You can edit this file manually 
 
 ## License
 
-MIT
+MIT License
