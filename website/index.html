@@ -3,13 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TuiBookie — CLI Command Bookmark Manager</title>
-  <meta name="description" content="A fast, beautiful TUI bookmark manager for your CLI commands. Organize, navigate, and execute with style.">
-  <meta property="og:title" content="TuiBookie — CLI Command Bookmark Manager">
-  <meta property="og:description" content="A fast, beautiful TUI bookmark manager for your CLI commands. Organize, navigate, and execute with style.">
-  <meta property="og:image" content="assets/tuibookie-logo.png">
+  <title>TuiBookie — SSH &amp; CLI Command Bookmark Manager for the Terminal</title>
+  <meta name="description" content="Save, organize, and run your SSH connections, Docker commands, and CLI workflows from a beautiful terminal UI. Free, open-source bookmark manager for the command line.">
+  <meta name="keywords" content="SSH bookmark manager, CLI command organizer, terminal bookmark, command line tool, TUI, SSH manager, Docker commands, kubectl bookmarks, shell command manager">
+  <link rel="canonical" href="https://tuibookie.dev">
+  <meta property="og:title" content="TuiBookie — SSH &amp; CLI Command Bookmark Manager for the Terminal">
+  <meta property="og:description" content="Save, organize, and run your SSH connections, Docker commands, and CLI workflows from a beautiful terminal UI.">
+  <meta property="og:image" content="https://tuibookie.dev/assets/tuibookie-logo.png">
+  <meta property="og:url" content="https://tuibookie.dev">
   <meta property="og:type" content="website">
   <link rel="icon" type="image/png" href="assets/tuibookie-logo.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "TuiBookie",
+    "description": "A fast, beautiful TUI bookmark manager for SSH connections and CLI commands. Organize, navigate, and execute with style.",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "macOS, Linux",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "license": "https://opensource.org/licenses/MIT",
+    "url": "https://tuibookie.dev",
+    "downloadUrl": "https://github.com/orvad/tuibookie/releases"
+  }
+  </script>
   <style>
     :root {
       --bg: #2d2a2e;
@@ -281,6 +298,28 @@
       line-height: 1.5;
     }
 
+    /* Why */
+    .why {
+      padding: 60px 0;
+      text-align: center;
+    }
+
+    .why-text {
+      max-width: 640px;
+      margin: 0 auto;
+      font-size: 16px;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+
+    .why-text p {
+      margin-bottom: 16px;
+    }
+
+    .why-text strong {
+      color: var(--text);
+    }
+
     /* Install */
     .install-section {
       padding: 60px 0;
@@ -524,6 +563,17 @@
           <h3>Monokai Theme</h3>
           <p>Beautiful dark color scheme with pink accents and green highlights. Easy on the eyes.</p>
         </div>
+      </div>
+    </section>
+
+    <!-- Why TuiBookie -->
+    <section class="why">
+      <div class="section-label">The story</div>
+      <h2 class="section-title">Why TuiBookie?</h2>
+      <div class="why-text">
+        <p>Tired of scrolling through shell history to find that one SSH command? TuiBookie was born from a simple frustration: <strong>too many servers, too many commands, no good way to organize them in the terminal.</strong></p>
+        <p>Built originally as an <strong>SSH bookmark manager</strong>, TuiBookie grew into a general-purpose CLI command organizer. Save any command &mdash; SSH connections, Docker workflows, kubectl operations, deployment scripts &mdash; and run them instantly from a clean, keyboard-driven interface.</p>
+        <p>No browser. No GUI. Just your terminal, organized.</p>
       </div>
     </section>
 
