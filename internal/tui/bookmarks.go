@@ -92,7 +92,7 @@ func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Model) viewBookmark() string {
 	var b strings.Builder
 
-	b.WriteString(titleStyle.Render("TuiBookie"))
+	b.WriteString(m.title())
 	b.WriteString("\n\n")
 	b.WriteString(selectedStyle.Render(m.selectedCat))
 	b.WriteString("\n\n")

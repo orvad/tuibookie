@@ -66,7 +66,7 @@ func (m Model) updateSettings(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Model) viewSettings() string {
 	var b strings.Builder
 
-	b.WriteString(titleStyle.Render("TuiBookie"))
+	b.WriteString(m.title())
 	b.WriteString("\n\n")
 	b.WriteString(normalStyle.Render("Settings"))
 	b.WriteString("\n\n")

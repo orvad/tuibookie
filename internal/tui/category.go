@@ -79,7 +79,7 @@ func (m Model) updateCategory(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Model) viewCategory() string {
 	var b strings.Builder
 
-	b.WriteString(titleStyle.Render("TuiBookie"))
+	b.WriteString(m.title())
 	b.WriteString("\n\n")
 
 	if len(m.categories) == 0 {

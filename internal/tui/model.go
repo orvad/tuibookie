@@ -30,6 +30,7 @@ const (
 type Model struct {
 	bookmarks   bookmark.Bookmarks
 	configPath  string
+	version     string
 	currentView view
 	categories  []string
 	catCursor   int
@@ -46,11 +47,12 @@ type Model struct {
 
 }
 
-func NewModel(bm bookmark.Bookmarks, configPath string) Model {
+func NewModel(bm bookmark.Bookmarks, configPath string, version string) Model {
 	cats := bookmark.Categories(bm)
 	return Model{
 		bookmarks:   bm,
 		configPath:  configPath,
+		version:     version,
 		currentView: categoryView,
 		categories:  cats,
 	}
@@ -103,6 +105,10 @@ func (m Model) View() tea.View {
 	}
 	v.AltScreen = true
 	return v
+}
+
+func (m Model) title() string {
+	return titleStyle.Render("TuiBookie " + m.version)
 }
 
 func (m *Model) refreshCategories() {

@@ -122,5 +122,5 @@ func (m Model) viewForm() string {
 	if m.form == nil {
 		return ""
 	}
-	return titleStyle.Render("TuiBookie") + "\n\n" + m.form.View()
+	return m.title() + "\n\n" + m.form.View()
 }

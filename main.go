@@ -12,6 +12,8 @@ import (
 	"example/tuibookie/internal/tui"
 )
 
+var version = "dev"
+
 func main() {
 	configFlag := flag.String("config", "", "path to bookmarks JSON file")
 	flag.Parse()
@@ -29,7 +31,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	model := tui.NewModel(bm, configPath)
+	model := tui.NewModel(bm, configPath, version)
 	p := tea.NewProgram(model)
 
 	if _, err := p.Run(); err != nil {
