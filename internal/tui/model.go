@@ -27,9 +27,20 @@ const (
 	formImportManual
 )
 
+type PathSource int
+
+const (
+	PathSourceDefault PathSource = iota
+	PathSourceConfig
+	PathSourceEnv
+	PathSourceFlag
+)
+
 type Model struct {
 	bookmarks   bookmark.Bookmarks
 	configPath  string
+	configDir   string
+	pathSource  PathSource
 	version     string
 	currentView view
 	categories  []string
@@ -47,11 +58,13 @@ type Model struct {
 
 }
 
-func NewModel(bm bookmark.Bookmarks, configPath string, version string) Model {
+func NewModel(bm bookmark.Bookmarks, configPath string, configDir string, pathSource PathSource, version string) Model {
 	cats := bookmark.Categories(bm)
 	return Model{
 		bookmarks:   bm,
 		configPath:  configPath,
+		configDir:   configDir,
+		pathSource:  pathSource,
 		version:     version,
 		currentView: categoryView,
 		categories:  cats,
