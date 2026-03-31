@@ -1,4 +1,5 @@
 .claude/
+docs/
 *-backup-*.json
 *.log
 *.tmp
