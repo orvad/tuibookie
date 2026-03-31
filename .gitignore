@@ -1,6 +1,6 @@
 .claude/
-docs/
 *-backup-*.json
+bookmark*.json
 *.log
 *.tmp
 *.cache
