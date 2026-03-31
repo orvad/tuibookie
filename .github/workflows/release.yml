@@ -14,6 +14,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Update website version
+        run: sed -i "s/<!--VERSION-->.*<!--\/VERSION-->/<!--VERSION-->${GITHUB_REF_NAME}<!--\/VERSION-->/" website/index.html
+
+      - name: Commit website version update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add website/index.html
+          git diff --cached --quiet || git commit -m "chore: update website version to ${GITHUB_REF_NAME}"
+          git push origin HEAD:main
+
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
