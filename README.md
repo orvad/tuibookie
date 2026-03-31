@@ -1,6 +1,13 @@
-# TuiBookie
+<p align="center">
+  <img src="logo/tuibookie-logo.png" alt="TuiBookie" width="200">
+</p>
 
-A fast, interactive terminal bookmark manager for CLI commands. Organize your frequently used commands into categories, browse them with an intuitive TUI, and execute with a single keypress.
+<h1 align="center">TuiBookie</h1>
+
+<p align="center">
+  A fast, interactive terminal bookmark manager for CLI commands.<br>
+  Organize your frequently used commands into categories, browse them with an intuitive TUI, and execute with a single keypress.
+</p>
 
 Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea), [Huh](https://github.com/charmbracelet/huh), and [Lip Gloss](https://github.com/charmbracelet/lipgloss) from the Charm ecosystem.
 
