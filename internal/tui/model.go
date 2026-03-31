@@ -102,6 +102,3 @@ func (m *Model) save() {
 	m.err = bookmark.Save(m.configPath, m.bookmarks)
 }
 
-// Stubs — implemented in subsequent tasks
-func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) { return m, nil }
-func (m Model) viewForm() string                            { return "" }
