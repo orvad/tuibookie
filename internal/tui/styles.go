@@ -11,7 +11,7 @@ var (
 			Bold(true).
 			Foreground(lipgloss.Color("#F8F8F2")).
 			Background(lipgloss.Color("#F92672")).
-			Padding(0, 2).
+			Padding(0, 0).
 			MarginTop(1).
 			MarginLeft(2)
 
