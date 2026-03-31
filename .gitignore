@@ -1,7 +1,10 @@
 .claude/
+.superpowers/
 *-backup-*.json
+docs/
 bookmark*.json
 *.log
 *.tmp
 *.cache
 *.bak
+
