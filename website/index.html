@@ -61,13 +61,6 @@
     /* Hero */
     .hero {
       padding: 80px 0 60px;
-      display: flex;
-      align-items: center;
-      gap: 48px;
-    }
-
-    .hero-text {
-      flex: 1;
     }
 
     .hero-logo {
@@ -97,12 +90,13 @@
       background: var(--terminal-bg);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 12px 16px;
+      padding: 14px 20px;
       font-family: var(--mono);
       font-size: 14px;
-      display: inline-flex;
+      display: flex;
       align-items: center;
       gap: 12px;
+      max-width: 520px;
     }
 
     .install-cmd code {
@@ -122,11 +116,6 @@
 
     .copy-btn:hover {
       color: var(--text);
-    }
-
-    .hero-screenshot {
-      flex: 1;
-      max-width: 480px;
     }
 
     /* Terminal Chrome */
@@ -361,9 +350,7 @@
     /* Responsive */
     @media (max-width: 768px) {
       .hero {
-        flex-direction: column;
         padding: 48px 0 40px;
-        gap: 32px;
       }
 
       .hero h1 {
@@ -372,10 +359,6 @@
 
       .hero .tagline {
         font-size: 16px;
-      }
-
-      .hero-screenshot {
-        max-width: 100%;
       }
 
       .install-cmd {
@@ -425,28 +408,6 @@
           <span style="color:var(--help)">$</span>
           <code>brew install orvad/tuibookie/tuibookie</code>
           <button class="copy-btn" onclick="copyCmd(this)">Copy</button>
-        </div>
-      </div>
-      <div class="hero-screenshot">
-        <div class="terminal">
-          <div class="terminal-bar">
-            <div class="terminal-dot red"></div>
-            <div class="terminal-dot yellow"></div>
-            <div class="terminal-dot green"></div>
-            <span class="terminal-title">/tuibookie</span>
-          </div>
-          <div class="terminal-body">
-            <div class="tui">
-              <div><span class="tui-badge">TuiBookie.dev</span></div>
-              <div class="tui-selected">&gt; Deployments (3)</div>
-              <div>&nbsp; Docker (4)</div>
-              <div>&nbsp; Kubernetes (3)</div>
-              <div>&nbsp; Monitoring (2)</div>
-              <div>&nbsp; Production Servers (3)</div>
-              <div>&nbsp; Staging Servers (2)</div>
-              <div class="tui-help"><span>[a]</span>dd <span>[e]</span>dit <span>[d]</span>elete <span>[s]</span>ettings <span>[enter/&rarr;]</span> open <span>[q/esc]</span> quit</div>
-            </div>
-          </div>
         </div>
       </div>
     </section>
