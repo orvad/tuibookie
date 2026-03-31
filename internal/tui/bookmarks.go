@@ -94,7 +94,7 @@ func (m Model) viewBookmark() string {
 
 	b.WriteString(m.title())
 	b.WriteString("\n\n")
-	b.WriteString(selectedStyle.Render(m.selectedCat))
+	b.WriteString(normalStyle.Render("  " + m.selectedCat))
 	b.WriteString("\n\n")
 
 	items := m.bookmarks[m.selectedCat]

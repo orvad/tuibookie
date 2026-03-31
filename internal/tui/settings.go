@@ -68,7 +68,7 @@ func (m Model) viewSettings() string {
 
 	b.WriteString(m.title())
 	b.WriteString("\n\n")
-	b.WriteString(normalStyle.Render("Settings"))
+	b.WriteString(normalStyle.Render("  Settings"))
 	b.WriteString("\n\n")
 
 	for i, opt := range settingsOptions {
