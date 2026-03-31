@@ -20,6 +20,20 @@ Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea), [Huh](https
 - **Configurable storage** — Choose where your bookmarks file lives
 - **Any CLI command** — SSH, rsync, docker, kubectl, or any command you use regularly
 
+## Screenshots
+
+**Browse categories** — See all your command groups at a glance with bookmark counts.
+
+<img src="examples/screenshot-01.png" alt="Category list" width="600">
+
+**Browse bookmarks** — Drill into a category to see commands. Select one and press Enter to run it.
+
+<img src="examples/screenshot-02.png" alt="Bookmark list" width="600">
+
+**Settings** — Export your bookmarks as a backup or import from a JSON file.
+
+<img src="examples/screenshot-03.png" alt="Settings" width="600">
+
 ## Installation
 
 ### Quick install (recommended)
