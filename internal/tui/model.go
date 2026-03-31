@@ -63,6 +63,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.width = msg.Width
 		m.height = msg.Height
 		return m, nil
+	case execDoneMsg:
+		if msg.err != nil {
+			m.err = msg.err
+		}
+		return m, tea.Quit
 	}
 
 	switch m.currentView {
@@ -98,7 +103,5 @@ func (m *Model) save() {
 }
 
 // Stubs — implemented in subsequent tasks
-func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) { return m, nil }
-func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd)     { return m, nil }
-func (m Model) viewBookmark() string                             { return "" }
-func (m Model) viewForm() string                                 { return "" }
+func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) { return m, nil }
+func (m Model) viewForm() string                            { return "" }
