@@ -31,6 +31,17 @@ func ConfigDir() string {
 	return filepath.Join(home, ".config", "tuibookie")
 }
 
+func SaveAppConfig(configDir string, cfg AppConfig) error {
+	if err := os.MkdirAll(configDir, 0755); err != nil {
+		return err
+	}
+	data, err := json.MarshalIndent(cfg, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(filepath.Join(configDir, "config.json"), data, 0644)
+}
+
 func LoadAppConfig(configDir string) (AppConfig, error) {
 	path := filepath.Join(configDir, "config.json")
 	data, err := os.ReadFile(path)

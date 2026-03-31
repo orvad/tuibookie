@@ -92,3 +92,29 @@ func TestLoadAppConfigEmpty(t *testing.T) {
 		t.Fatalf("expected empty BookmarksPath, got %s", cfg.BookmarksPath)
 	}
 }
+
+func TestSaveAppConfig(t *testing.T) {
+	dir := t.TempDir()
+	cfg := AppConfig{BookmarksPath: "/tmp/custom.json"}
+	if err := SaveAppConfig(dir, cfg); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	loaded, err := LoadAppConfig(dir)
+	if err != nil {
+		t.Fatalf("unexpected error loading: %v", err)
+	}
+	if loaded.BookmarksPath != "/tmp/custom.json" {
+		t.Fatalf("expected /tmp/custom.json, got %s", loaded.BookmarksPath)
+	}
+}
+
+func TestSaveAppConfigCreatesDir(t *testing.T) {
+	dir := filepath.Join(t.TempDir(), "nested", "dir")
+	cfg := AppConfig{BookmarksPath: "/tmp/test.json"}
+	if err := SaveAppConfig(dir, cfg); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(dir, "config.json")); err != nil {
+		t.Fatalf("config.json not created: %v", err)
+	}
+}
