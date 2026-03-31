@@ -53,8 +53,9 @@ type Model struct {
 	formAction  formAction
 	editIndex      int
 	settingsCursor int
-	err            error
-	statusMsg      string
+	err               error
+	statusMsg         string
+	pendingConfigPath string
 	width       int
 	height      int
 

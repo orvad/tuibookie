@@ -1,10 +1,14 @@
 package tui
 
 import (
+	"fmt"
+	"os"
+
 	"charm.land/huh/v2"
 	tea "charm.land/bubbletea/v2"
 
 	"example/tuibookie/internal/bookmark"
+	"example/tuibookie/internal/config"
 )
 
 func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -17,7 +21,8 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.currentView = categoryView
 			case formAddBookmark, formEditBookmark:
 				m.currentView = bookmarkView
-			case formImport, formImportManual:
+			case formImport, formImportManual, formChangeBookmarksPath, formConfirmBookmarksPath:
+				m.pendingConfigPath = ""
 				m.currentView = settingsView
 			}
 			m.form = nil
@@ -110,6 +115,100 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.statusMsg = "Imported from " + path
 				}
 			}
+			m.currentView = settingsView
+
+		case formChangeBookmarksPath:
+			path := m.form.GetString("path")
+			if path == "" || path == m.configPath {
+				m.currentView = settingsView
+				break
+			}
+			// Validate the path
+			bm, err := bookmark.Load(path)
+			if err != nil {
+				if os.IsNotExist(err) {
+					// File doesn't exist — ask to create
+					m.pendingConfigPath = path
+					m.formAction = formConfirmBookmarksPath
+					m.form = huh.NewForm(
+						huh.NewGroup(
+							huh.NewConfirm().
+								Title("File not found. Create a new empty bookmarks file at this path?").
+								Key("confirm"),
+						),
+					)
+					return m, m.form.Init()
+				}
+				m.statusMsg = "Invalid file: " + err.Error()
+				m.currentView = settingsView
+				break
+			}
+			// File exists and is valid — show confirmation with stats
+			cats := bookmark.Categories(bm)
+			totalBookmarks := 0
+			for _, items := range bm {
+				totalBookmarks += len(items)
+			}
+			m.pendingConfigPath = path
+			m.formAction = formConfirmBookmarksPath
+			title := fmt.Sprintf("Switch to this file? (%d categories, %d bookmarks)", len(cats), totalBookmarks)
+			m.form = huh.NewForm(
+				huh.NewGroup(
+					huh.NewConfirm().
+						Title(title).
+						Key("confirm"),
+				),
+			)
+			return m, m.form.Init()
+
+		case formConfirmBookmarksPath:
+			confirmed := m.form.GetBool("confirm")
+			if !confirmed {
+				m.pendingConfigPath = ""
+				m.currentView = settingsView
+				break
+			}
+			path := m.pendingConfigPath
+			m.pendingConfigPath = ""
+
+			// Create file if it doesn't exist
+			if _, err := os.Stat(path); os.IsNotExist(err) {
+				if err := config.EnsureConfigDir(path); err != nil {
+					m.statusMsg = "Error creating directory: " + err.Error()
+					m.currentView = settingsView
+					break
+				}
+				if err := bookmark.Save(path, bookmark.Bookmarks{}); err != nil {
+					m.statusMsg = "Error creating file: " + err.Error()
+					m.currentView = settingsView
+					break
+				}
+			}
+
+			// Load bookmarks from new path
+			bm, err := bookmark.Load(path)
+			if err != nil {
+				m.statusMsg = "Error loading bookmarks: " + err.Error()
+				m.currentView = settingsView
+				break
+			}
+
+			// Save to config.json
+			appCfg := config.AppConfig{BookmarksPath: path}
+			if err := config.SaveAppConfig(m.configDir, appCfg); err != nil {
+				m.statusMsg = "Error saving config: " + err.Error()
+				m.currentView = settingsView
+				break
+			}
+
+			// Hot-reload
+			m.configPath = path
+			m.bookmarks = bm
+			m.pathSource = PathSourceConfig
+			m.refreshCategories()
+			m.catCursor = 0
+			m.bmCursor = 0
+			m.statusMsg = "Switched to " + path
 			m.currentView = settingsView
 		}
 		m.form = nil
