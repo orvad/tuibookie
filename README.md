@@ -17,31 +17,51 @@ Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea), [Huh](https
 
 ## Installation
 
-### Prerequisites
+### Quick install (recommended)
 
-- [Go](https://go.dev/dl/) 1.26 or later
+Automatically downloads the latest release for your OS and architecture:
+
+```bash
+curl -sL https://raw.githubusercontent.com/orvad/tuibookie/main/install.sh | sh
+```
+
+### Homebrew (macOS and Linux)
+
+```bash
+brew tap orvad/tuibookie
+brew install tuibookie
+```
+
+### Download manually
+
+Download the latest binary from the [Releases page](https://github.com/orvad/tuibookie/releases):
+
+| Platform | Binary |
+|---|---|
+| macOS (Apple Silicon) | `tuibookie-darwin-arm64` |
+| macOS (Intel) | `tuibookie-darwin-amd64` |
+| Linux (x86_64) | `tuibookie-linux-amd64` |
+| Linux (ARM64) | `tuibookie-linux-arm64` |
+
+Then make it executable and move it to your PATH:
+
+```bash
+chmod +x tuibookie-*
+sudo mv tuibookie-* /usr/local/bin/tuibookie
+```
 
 ### Build from source
 
+Requires [Go](https://go.dev/dl/) 1.26 or later:
+
 ```bash
-git clone <repo-url>
+git clone https://github.com/orvad/tuibookie.git
 cd tuibookie
 go build -o tuibookie .
-```
-
-This produces a `tuibookie` binary in the current directory. Move it to a directory in your `$PATH` to use it from anywhere:
-
-```bash
-# Example: move to /usr/local/bin
 sudo mv tuibookie /usr/local/bin/
-
-# Or to a user-local bin directory
-mv tuibookie ~/.local/bin/
 ```
 
-### Cross-compilation
-
-Build for a different platform:
+#### Cross-compilation
 
 ```bash
 # Linux (amd64)
