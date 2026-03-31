@@ -22,6 +22,7 @@
       --terminal-bg: #1a1a1a;
       --border: #3e3d40;
       --yellow: #e6db74;
+      --mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -40,7 +41,7 @@
     }
 
     code, .mono {
-      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-family: var(--mono);
     }
 
     .section-label {
@@ -97,7 +98,7 @@
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 12px 16px;
-      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-family: var(--mono);
       font-size: 14px;
       display: inline-flex;
       align-items: center;
@@ -159,7 +160,7 @@
       text-align: center;
       font-size: 12px;
       color: var(--help);
-      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-family: var(--mono);
     }
 
     .terminal-body {
@@ -223,7 +224,7 @@
       font-size: 24px;
       margin-bottom: 12px;
       color: var(--green);
-      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-family: var(--mono);
       font-weight: bold;
     }
 
@@ -405,7 +406,7 @@
     <!-- Screenshots -->
     <section class="screenshots">
       <div class="section-label">See it in action</div>
-      <div class="section-title">Organize. Navigate. Execute.</div>
+      <h2 class="section-title">Organize. Navigate. Execute.</h2>
       <div class="screenshot-row">
         <div class="screenshot-item">
           <div class="terminal">
@@ -453,7 +454,7 @@
     <section class="features">
       <div style="text-align:center">
         <div class="section-label">Features</div>
-        <div class="section-title">Everything you need, nothing you don't.</div>
+        <h2 class="section-title">Everything you need, nothing you don't.</h2>
       </div>
       <div class="features-grid">
         <div class="feature-card">
@@ -492,7 +493,7 @@
     <!-- Install -->
     <section class="install-section">
       <div class="section-label">Get started</div>
-      <div class="section-title">Install in seconds.</div>
+      <h2 class="section-title">Install in seconds.</h2>
       <div class="install-methods">
         <div class="install-method">
           <div class="method-label">Homebrew</div>
@@ -531,6 +532,9 @@
     var code = btn.parentElement.querySelector('code');
     navigator.clipboard.writeText(code.textContent).then(function() {
       btn.textContent = 'Copied!';
+      setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+    }).catch(function() {
+      btn.textContent = 'Failed';
       setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
     });
   }
