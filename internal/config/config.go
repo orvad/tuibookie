@@ -1,6 +1,7 @@
 package config
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 )
@@ -19,4 +20,29 @@ func ResolvePath(flagPath, envPath string) string {
 func EnsureConfigDir(path string) error {
 	dir := filepath.Dir(path)
 	return os.MkdirAll(dir, 0755)
+}
+
+type AppConfig struct {
+	BookmarksPath string `json:"bookmarks_path,omitempty"`
+}
+
+func ConfigDir() string {
+	home, _ := os.UserHomeDir()
+	return filepath.Join(home, ".config", "tuibookie")
+}
+
+func LoadAppConfig(configDir string) (AppConfig, error) {
+	path := filepath.Join(configDir, "config.json")
+	data, err := os.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return AppConfig{}, nil
+		}
+		return AppConfig{}, err
+	}
+	var cfg AppConfig
+	if err := json.Unmarshal(data, &cfg); err != nil {
+		return AppConfig{}, err
+	}
+	return cfg, nil
 }

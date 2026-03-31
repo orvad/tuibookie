@@ -51,3 +51,44 @@ func TestEnsureConfigDir(t *testing.T) {
 		t.Fatal("expected directory")
 	}
 }
+
+func TestLoadAppConfigMissing(t *testing.T) {
+	dir := t.TempDir()
+	cfg, err := LoadAppConfig(dir)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if cfg.BookmarksPath != "" {
+		t.Fatalf("expected empty BookmarksPath, got %s", cfg.BookmarksPath)
+	}
+}
+
+func TestLoadAppConfigValid(t *testing.T) {
+	dir := t.TempDir()
+	data := []byte(`{"bookmarks_path": "/tmp/my-bookmarks.json"}`)
+	if err := os.WriteFile(filepath.Join(dir, "config.json"), data, 0644); err != nil {
+		t.Fatal(err)
+	}
+	cfg, err := LoadAppConfig(dir)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if cfg.BookmarksPath != "/tmp/my-bookmarks.json" {
+		t.Fatalf("expected /tmp/my-bookmarks.json, got %s", cfg.BookmarksPath)
+	}
+}
+
+func TestLoadAppConfigEmpty(t *testing.T) {
+	dir := t.TempDir()
+	data := []byte(`{}`)
+	if err := os.WriteFile(filepath.Join(dir, "config.json"), data, 0644); err != nil {
+		t.Fatal(err)
+	}
+	cfg, err := LoadAppConfig(dir)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if cfg.BookmarksPath != "" {
+		t.Fatalf("expected empty BookmarksPath, got %s", cfg.BookmarksPath)
+	}
+}
