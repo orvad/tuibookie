@@ -41,3 +41,80 @@ jobs:
             tuibookie-darwin-amd64
             tuibookie-linux-amd64
             tuibookie-linux-arm64
+
+      - name: Generate SHA256 checksums
+        id: checksums
+        run: |
+          echo "darwin_arm64=$(sha256sum tuibookie-darwin-arm64 | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+          echo "darwin_amd64=$(sha256sum tuibookie-darwin-amd64 | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+          echo "linux_amd64=$(sha256sum tuibookie-linux-amd64 | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+          echo "linux_arm64=$(sha256sum tuibookie-linux-arm64 | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+
+      - name: Update Homebrew formula
+        env:
+          VERSION: ${{ github.ref_name }}
+          SHA_DARWIN_ARM64: ${{ steps.checksums.outputs.darwin_arm64 }}
+          SHA_DARWIN_AMD64: ${{ steps.checksums.outputs.darwin_amd64 }}
+          SHA_LINUX_AMD64: ${{ steps.checksums.outputs.linux_amd64 }}
+          SHA_LINUX_ARM64: ${{ steps.checksums.outputs.linux_arm64 }}
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          CLEAN_VERSION="${VERSION#v}"
+
+          cat > /tmp/tuibookie.rb << FORMULA
+          class Tuibookie < Formula
+            desc "A fast, interactive terminal bookmark manager for CLI commands"
+            homepage "https://github.com/orvad/tuibookie"
+            version "${CLEAN_VERSION}"
+            license "MIT"
+
+            on_macos do
+              if Hardware::CPU.arm?
+                url "https://github.com/orvad/tuibookie/releases/download/${VERSION}/tuibookie-darwin-arm64"
+                sha256 "${SHA_DARWIN_ARM64}"
+
+                def install
+                  bin.install "tuibookie-darwin-arm64" => "tuibookie"
+                end
+              else
+                url "https://github.com/orvad/tuibookie/releases/download/${VERSION}/tuibookie-darwin-amd64"
+                sha256 "${SHA_DARWIN_AMD64}"
+
+                def install
+                  bin.install "tuibookie-darwin-amd64" => "tuibookie"
+                end
+              end
+            end
+
+            on_linux do
+              if Hardware::CPU.arm?
+                url "https://github.com/orvad/tuibookie/releases/download/${VERSION}/tuibookie-linux-arm64"
+                sha256 "${SHA_LINUX_ARM64}"
+
+                def install
+                  bin.install "tuibookie-linux-arm64" => "tuibookie"
+                end
+              else
+                url "https://github.com/orvad/tuibookie/releases/download/${VERSION}/tuibookie-linux-amd64"
+                sha256 "${SHA_LINUX_AMD64}"
+
+                def install
+                  bin.install "tuibookie-linux-amd64" => "tuibookie"
+                end
+              end
+            end
+
+            test do
+              assert_match version.to_s, shell_output("#{bin}/tuibookie --help 2>&1", 2)
+            end
+          end
+          FORMULA
+
+          git clone "https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/orvad/homebrew-tuibookie.git" /tmp/homebrew-tap
+          cp /tmp/tuibookie.rb /tmp/homebrew-tap/Formula/tuibookie.rb
+          cd /tmp/homebrew-tap
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/tuibookie.rb
+          git commit -m "Update tuibookie to ${VERSION}"
+          git push
