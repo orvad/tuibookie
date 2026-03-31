@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TuiBookie — CLI Command Bookmark Manager</title>
+  <meta name="description" content="A fast, beautiful TUI bookmark manager for your CLI commands. Organize, navigate, and execute with style.">
+  <meta property="og:title" content="TuiBookie — CLI Command Bookmark Manager">
+  <meta property="og:description" content="A fast, beautiful TUI bookmark manager for your CLI commands. Organize, navigate, and execute with style.">
+  <meta property="og:image" content="assets/tuibookie-logo.png">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/png" href="assets/tuibookie-logo.png">
+  <style>
+    :root {
+      --bg: #2d2a2e;
+      --surface: #383539;
+      --text: #f8f8f2;
+      --accent: #f92672;
+      --green: #a6e22e;
+      --muted: #a59f85;
+      --help: #75715e;
+      --terminal-bg: #1a1a1a;
+      --border: #3e3d40;
+      --yellow: #e6db74;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    code, .mono {
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    }
+
+    .section-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 40px;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 80px 0 60px;
+      display: flex;
+      align-items: center;
+      gap: 48px;
+    }
+
+    .hero-text {
+      flex: 1;
+    }
+
+    .hero-logo {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+    }
+
+    .hero h1 {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .hero h1 span {
+      color: var(--accent);
+    }
+
+    .hero .tagline {
+      font-size: 18px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .install-cmd {
+      background: var(--terminal-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .install-cmd code {
+      color: var(--green);
+    }
+
+    .copy-btn {
+      background: var(--surface);
+      border: none;
+      color: var(--help);
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      font-family: inherit;
+    }
+
+    .copy-btn:hover {
+      color: var(--text);
+    }
+
+    .hero-screenshot {
+      flex: 1;
+      max-width: 420px;
+    }
+
+    /* Terminal Chrome */
+    .terminal {
+      background: var(--terminal-bg);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .terminal-bar {
+      background: var(--surface);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .terminal-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .terminal-dot.red { background: var(--accent); }
+    .terminal-dot.yellow { background: var(--yellow); }
+    .terminal-dot.green { background: var(--green); }
+
+    .terminal-title {
+      flex: 1;
+      text-align: center;
+      font-size: 12px;
+      color: var(--help);
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    }
+
+    .terminal-body {
+      padding: 4px;
+    }
+
+    .terminal-body img {
+      width: 100%;
+      display: block;
+      border-radius: 0 0 8px 8px;
+    }
+
+    /* Screenshots */
+    .screenshots {
+      padding: 60px 0;
+      text-align: center;
+    }
+
+    .screenshot-row {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .screenshot-item {
+      flex: 1;
+      max-width: 300px;
+    }
+
+    .screenshot-item .terminal-body img {
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      object-position: top;
+    }
+
+    .screenshot-caption {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--help);
+    }
+
+    /* Features */
+    .features {
+      padding: 60px 0;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border-radius: 10px;
+      padding: 24px;
+      border: 1px solid var(--border);
+    }
+
+    .feature-icon {
+      font-size: 24px;
+      margin-bottom: 12px;
+      color: var(--green);
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-weight: bold;
+    }
+
+    .feature-card h3 {
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    .feature-card p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* Install */
+    .install-section {
+      padding: 60px 0;
+      text-align: center;
+    }
+
+    .install-methods {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 32px;
+    }
+
+    .install-method {
+      background: var(--terminal-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      flex: 1;
+      max-width: 300px;
+      text-align: left;
+    }
+
+    .install-method .method-label {
+      font-size: 12px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    .install-method code {
+      font-size: 13px;
+      color: var(--green);
+      word-break: break-all;
+    }
+
+    .install-method .copy-btn {
+      margin-top: 12px;
+      display: block;
+    }
+
+    /* GitHub CTA */
+    .github-cta {
+      padding: 40px 0;
+      text-align: center;
+    }
+
+    .github-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 15px;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .github-btn:hover {
+      border-color: var(--green);
+    }
+
+    /* Footer */
+    footer {
+      padding: 32px 0;
+      text-align: center;
+      color: var(--help);
+      font-size: 13px;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-text">
+        <img src="assets/tuibookie-logo.png" alt="TuiBookie logo" class="hero-logo">
+        <h1>Tui<span>Bookie</span></h1>
+        <p class="tagline">A fast, beautiful TUI bookmark manager<br>for your CLI commands.</p>
+        <div class="install-cmd">
+          <span style="color:var(--help)">$</span>
+          <code>brew install orvad/tuibookie/tuibookie</code>
+          <button class="copy-btn" onclick="copyCmd(this)">Copy</button>
+        </div>
+      </div>
+      <div class="hero-screenshot">
+        <div class="terminal">
+          <div class="terminal-bar">
+            <div class="terminal-dot red"></div>
+            <div class="terminal-dot yellow"></div>
+            <div class="terminal-dot green"></div>
+            <span class="terminal-title">/tuibookie</span>
+          </div>
+          <div class="terminal-body">
+            <img src="assets/screenshot-01.png" alt="TuiBookie categories view">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Screenshots -->
+    <section class="screenshots">
+      <div class="section-label">See it in action</div>
+      <div class="section-title">Organize. Navigate. Execute.</div>
+      <div class="screenshot-row">
+        <div class="screenshot-item">
+          <div class="terminal">
+            <div class="terminal-bar">
+              <div class="terminal-dot red"></div>
+              <div class="terminal-dot yellow"></div>
+              <div class="terminal-dot green"></div>
+            </div>
+            <div class="terminal-body">
+              <img src="assets/screenshot-01.png" alt="Categories view">
+            </div>
+          </div>
+          <div class="screenshot-caption">Browse categories</div>
+        </div>
+        <div class="screenshot-item">
+          <div class="terminal">
+            <div class="terminal-bar">
+              <div class="terminal-dot red"></div>
+              <div class="terminal-dot yellow"></div>
+              <div class="terminal-dot green"></div>
+            </div>
+            <div class="terminal-body">
+              <img src="assets/screenshot-02.png" alt="Bookmarks view">
+            </div>
+          </div>
+          <div class="screenshot-caption">Run bookmarked commands</div>
+        </div>
+        <div class="screenshot-item">
+          <div class="terminal">
+            <div class="terminal-bar">
+              <div class="terminal-dot red"></div>
+              <div class="terminal-dot yellow"></div>
+              <div class="terminal-dot green"></div>
+            </div>
+            <div class="terminal-body">
+              <img src="assets/screenshot-03.png" alt="Settings view">
+            </div>
+          </div>
+          <div class="screenshot-caption">Import &amp; export backups</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features">
+      <div style="text-align:center">
+        <div class="section-label">Features</div>
+        <div class="section-title">Everything you need, nothing you don't.</div>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">[:]</div>
+          <h3>Categories</h3>
+          <p>Group commands by project, environment, or workflow. Add, rename, delete on the fly.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#8644;</div>
+          <h3>Import / Export</h3>
+          <p>Back up your bookmarks as JSON. Import from file picker or manual path.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">hjkl</div>
+          <h3>Vim Navigation</h3>
+          <p>Arrow keys and vim-style h/j/k/l navigation. Drill in with &rarr;, back with &larr;.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&gt;_</div>
+          <h3>Execute Instantly</h3>
+          <p>Hit Enter to run any bookmarked command directly from the TUI.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">~/.cfg</div>
+          <h3>Configurable</h3>
+          <p>Custom storage path via --config flag or TUIBOOKIE_CONFIG env var.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="color:var(--accent)">&#9632;</div>
+          <h3>Monokai Theme</h3>
+          <p>Beautiful dark color scheme with pink accents and green highlights. Easy on the eyes.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Install -->
+    <section class="install-section">
+      <div class="section-label">Get started</div>
+      <div class="section-title">Install in seconds.</div>
+      <div class="install-methods">
+        <div class="install-method">
+          <div class="method-label">Homebrew</div>
+          <code>brew install orvad/tuibookie/tuibookie</code>
+          <button class="copy-btn" onclick="copyCmd(this)">Copy</button>
+        </div>
+        <div class="install-method">
+          <div class="method-label">Quick Install</div>
+          <code>curl -sL https://raw.githubusercontent.com/orvad/tuibookie/main/install.sh | sh</code>
+          <button class="copy-btn" onclick="copyCmd(this)">Copy</button>
+        </div>
+        <div class="install-method">
+          <div class="method-label">From Source</div>
+          <code>go install github.com/orvad/tuibookie@latest</code>
+          <button class="copy-btn" onclick="copyCmd(this)">Copy</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- GitHub CTA -->
+    <section class="github-cta">
+      <a href="https://github.com/orvad/tuibookie" class="github-btn" target="_blank" rel="noopener">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        Star on GitHub
+      </a>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      Made with <span style="color:var(--accent)">&hearts;</span> by orvad &middot; TuiBookie is open source
+    </footer>
+  </div>
+
+  <script>
+  function copyCmd(btn) {
+    var code = btn.parentElement.querySelector('code');
+    navigator.clipboard.writeText(code.textContent).then(function() {
+      btn.textContent = 'Copied!';
+      setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+    });
+  }
+  </script>
+</body>
+</html>
