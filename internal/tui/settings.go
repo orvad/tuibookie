@@ -87,7 +87,7 @@ func (m Model) viewSettings() string {
 	}
 
 	b.WriteString("\n")
-	b.WriteString(helpStyle.Render("[enter/→] select  [←/esc] back  [q] quit"))
+	b.WriteString(renderHelp("[enter/→] select  [←/esc] back  [q] quit"))
 
 	return b.String()
 }

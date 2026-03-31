@@ -114,7 +114,7 @@ func (m Model) viewBookmark() string {
 	}
 
 	b.WriteString("\n")
-	b.WriteString(helpStyle.Render("[a]dd  [e]dit  [d]elete  [enter] run  [←/esc] back  [q]uit"))
+	b.WriteString(renderHelp("[a]dd  [e]dit  [d]elete  [enter] run  [←/esc] back  [q]uit"))
 
 	return b.String()
 }
