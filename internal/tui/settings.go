@@ -96,7 +96,7 @@ func (m Model) viewSettings() string {
 
 	b.WriteString(m.title())
 	b.WriteString("\n\n")
-	b.WriteString(normalStyle.Render("  Settings"))
+	b.WriteString(headingStyle.Render("  SETTINGS"))
 	b.WriteString("\n\n")
 
 	// CONFIG section
@@ -134,7 +134,7 @@ func (m Model) viewSettings() string {
 		b.WriteString("\n")
 	}
 
-	b.WriteString("\n")
+	b.WriteString("\n\n")
 	b.WriteString(renderHelp("[enter/→] select  [←/esc] back  [q] quit"))
 
 	return b.String()

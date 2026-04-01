@@ -99,7 +99,7 @@ func (m Model) viewCategory() string {
 		}
 	}
 
-	b.WriteString("\n")
+	b.WriteString("\n\n")
 	b.WriteString(renderHelp("[a]dd  [e]dit  [d]elete  [s]ettings  [enter/→] open  [q/esc] quit"))
 
 	return b.String()

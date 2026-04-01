@@ -7,13 +7,15 @@ import (
 )
 
 var (
-	titleStyle = lipgloss.NewStyle().
+	titleNameStyle = lipgloss.NewStyle().
 			Bold(true).
-			Foreground(lipgloss.Color("#F8F8F2")).
-			Background(lipgloss.Color("#F92672")).
-			Padding(0, 1).
-			MarginTop(1).
-			MarginLeft(2)
+			Foreground(lipgloss.Color("#F92672"))
+
+	titleVersionStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("#75715E"))
+
+	titleSepStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#75715E"))
 
 	helpStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("#75715E"))
@@ -24,6 +26,10 @@ var (
 	selectedStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("#A6E22E")).
 			Bold(true)
+
+	headingStyle = lipgloss.NewStyle().
+			Bold(true).
+			Foreground(lipgloss.Color("#A6E22E"))
 
 	normalStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("#F8F8F2"))

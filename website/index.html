@@ -223,18 +223,29 @@
     }
 
     .tui-badge {
-      display: inline-block;
-      background: var(--accent);
-      color: var(--text);
-      padding: 1px 8px;
-      border-radius: 3px;
+      display: block;
       font-size: 12px;
+      margin-bottom: 4px;
+    }
+    .tui-badge .tui-title-name {
+      color: var(--accent);
       font-weight: bold;
+    }
+    .tui-badge .tui-title-ver {
+      color: var(--help);
+    }
+    .tui-sep {
+      color: var(--help);
       margin-bottom: 12px;
+      letter-spacing: -1px;
+      overflow: hidden;
+      white-space: nowrap;
     }
 
     .tui-heading {
-      color: var(--text);
+      color: var(--green);
+      font-weight: bold;
+      text-transform: uppercase;
       margin-bottom: 8px;
     }
 
@@ -475,13 +486,14 @@
             </div>
             <div class="terminal-body">
               <div class="tui">
-                <div><span class="tui-badge">TuiBookie <!--VERSION-->v1.1.4<!--/VERSION--></span></div>
+                <div class="tui-badge"><span class="tui-title-name">◆ TuiBookie</span> <span class="tui-title-ver"><!--VERSION-->v1.1.4<!--/VERSION--></span></div>
+                <div class="tui-sep">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
                 <div class="tui-selected">&gt; Deployments (3)</div>
                 <div>&nbsp; Docker (4)</div>
                 <div>&nbsp; Kubernetes (3)</div>
                 <div>&nbsp; Monitoring (2)</div>
-                <div>&nbsp; Production Servers (3)</div>
-                <div>&nbsp; Staging Servers (2)</div>
+                <div>&nbsp; Production servers (3)</div>
+                <div>&nbsp; Staging servers (2)</div>
                 <div class="tui-help"><span>[a]</span>dd <span>[e]</span>dit <span>[d]</span>elete <span>[s]</span>ettings <span>[enter/&rarr;]</span> open <span>[q/esc]</span> quit</div>
               </div>
             </div>
@@ -497,12 +509,12 @@
             </div>
             <div class="terminal-body">
               <div class="tui">
-                <div><span class="tui-badge">TuiBookie <!--VERSION-->v1.1.4<!--/VERSION--></span></div>
-                <div class="tui-heading">Docker</div>
-                <div class="tui-selected">&gt; Clean up <span class="tui-cmd">docker system prune -af</span></div>
-                <div>&nbsp; Follow logs <span class="tui-cmd">docker compose logs -f</span></div>
-                <div>&nbsp; Start stack <span class="tui-cmd">docker compose up -d</span></div>
-                <div>&nbsp; Stop stack <span class="tui-cmd">docker compose down</span></div>
+                <div class="tui-badge"><span class="tui-title-name">◆ TuiBookie</span> <span class="tui-title-ver"><!--VERSION-->v1.1.4<!--/VERSION--></span></div>
+                <div class="tui-sep">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+                <div class="tui-heading">Kubernetes</div>
+                <div class="tui-selected">&gt; API logs <span class="tui-cmd">kubectl logs -f deployment/api -n production</span></div>
+                <div>&nbsp; Node resources <span class="tui-cmd">kubectl top nodes</span></div>
+                <div>&nbsp; Prod pods <span class="tui-cmd">kubectl get pods -n production</span></div>
                 <div class="tui-help"><span>[a]</span>dd <span>[e]</span>dit <span>[d]</span>elete <span>[enter]</span> run <span>[&larr;/esc]</span> back <span>[q]</span>uit</div>
               </div>
             </div>
@@ -518,13 +530,13 @@
             </div>
             <div class="terminal-body">
               <div class="tui">
-                <div><span class="tui-badge">TuiBookie <!--VERSION-->v1.1.4<!--/VERSION--></span></div>
+                <div class="tui-badge"><span class="tui-title-name">◆ TuiBookie</span> <span class="tui-title-ver"><!--VERSION-->v1.1.4<!--/VERSION--></span></div>
+                <div class="tui-sep">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
                 <div class="tui-heading">Settings</div>
-                <div>&nbsp;</div>
-                <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--help)">CONFIG</div>
+                <div style="color:var(--help)">CONFIG</div>
                 <div class="tui-selected">&gt; Bookmarks file: ~/.config/tuibookie/bookmarks.json</div>
                 <div>&nbsp;</div>
-                <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--help)">DATA</div>
+                <div style="color:var(--help)">DATA</div>
                 <div>&nbsp; Export bookmarks</div>
                 <div>&nbsp; Import bookmarks</div>
                 <div class="tui-help"><span>[enter/&rarr;]</span> select <span>[&larr;/esc]</span> back <span>[q]</span> quit</div>

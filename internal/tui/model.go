@@ -1,6 +1,9 @@
 package tui
 
 import (
+	"fmt"
+	"strings"
+
 	"charm.land/huh/v2"
 	tea "charm.land/bubbletea/v2"
 
@@ -123,7 +126,10 @@ func (m Model) View() tea.View {
 }
 
 func (m Model) title() string {
-	return titleStyle.Render("TuiBookie " + m.version)
+	name := titleNameStyle.Render("◆ TuiBookie")
+	ver := titleVersionStyle.Render(" " + m.version)
+	sep := titleSepStyle.Render(strings.Repeat("━", max(0, m.width-4)))
+	return fmt.Sprintf("\n  %s%s\n  %s", name, ver, sep)
 }
 
 func (m *Model) refreshCategories() {
