@@ -51,7 +51,7 @@ func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
 						Title("Command").
 						Key("cmd"),
 				),
-			)
+			).WithTheme(formTheme)
 			m.currentView = formView
 			return m, m.form.Init()
 		case "e":
@@ -72,7 +72,7 @@ func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
 							Key("cmd").
 							Value(&editCmd),
 					),
-				)
+				).WithTheme(formTheme)
 				m.currentView = formView
 				return m, m.form.Init()
 			}

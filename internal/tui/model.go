@@ -8,6 +8,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 
 	"example/tuibookie/internal/bookmark"
+	"example/tuibookie/internal/config"
 )
 
 type view int
@@ -17,6 +18,7 @@ const (
 	bookmarkView
 	settingsView
 	formView
+	confirmView
 )
 
 type formAction int
@@ -30,6 +32,8 @@ const (
 	formImportManual
 	formChangeBookmarksPath
 	formConfirmBookmarksPath
+	formSetGistToken
+	formConfirmPull
 )
 
 type PathSource int
@@ -59,12 +63,23 @@ type Model struct {
 	err               error
 	statusMsg         string
 	pendingConfigPath string
+	gistToken         string
+	gistID            string
+	pendingGistToken  string
+	confirmMsg        string
+	confirmAction     formAction
+	confirmCursor     int // 0=Yes, 1=No
 	width             int
 	height            int
 }
 
 func NewModel(bm bookmark.Bookmarks, configPath string, configDir string, pathSource PathSource, version string) Model {
 	cats := bookmark.Categories(bm)
+	var gistToken, gistID string
+	if appCfg, err := config.LoadAppConfig(configDir); err == nil {
+		gistToken = appCfg.GistToken
+		gistID = appCfg.GistID
+	}
 	return Model{
 		bookmarks:   bm,
 		configPath:  configPath,
@@ -73,6 +88,8 @@ func NewModel(bm bookmark.Bookmarks, configPath string, configDir string, pathSo
 		version:     version,
 		currentView: categoryView,
 		categories:  cats,
+		gistToken:   gistToken,
+		gistID:      gistID,
 	}
 }
 
@@ -102,6 +119,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.updateSettings(msg)
 	case formView:
 		return m.updateForm(msg)
+	case confirmView:
+		return m.updateConfirm(msg)
 	}
 
 	return m, nil
@@ -116,6 +135,8 @@ func (m Model) View() tea.View {
 		v = tea.NewView(m.viewBookmark())
 	case settingsView:
 		v = tea.NewView(m.viewSettings())
+	case confirmView:
+		v = tea.NewView(m.viewConfirm())
 	case formView:
 		v = tea.NewView(m.viewForm())
 	default:
@@ -128,8 +149,16 @@ func (m Model) View() tea.View {
 func (m Model) title() string {
 	name := titleNameStyle.Render("◆ TuiBookie")
 	ver := titleVersionStyle.Render(" " + m.version)
+	left := "◆ TuiBookie " + m.version
 	sep := titleSepStyle.Render(strings.Repeat("━", max(0, m.width-4)))
-	return fmt.Sprintf("\n  %s%s\n  %s", name, ver, sep)
+
+	if m.statusMsg == "" {
+		return fmt.Sprintf("\n  %s%s\n  %s", name, ver, sep)
+	}
+
+	styledMsg := statusMsgStyle.Render(m.statusMsg)
+	gap := max(1, m.width-4-len(left)-len(m.statusMsg))
+	return fmt.Sprintf("\n  %s%s%s%s\n  %s", name, ver, strings.Repeat(" ", gap), styledMsg, sep)
 }
 
 func (m *Model) refreshCategories() {

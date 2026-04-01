@@ -39,7 +39,7 @@ func (m Model) updateCategory(msg tea.Msg) (tea.Model, tea.Cmd) {
 						Title("Category name").
 						Key("name"),
 				),
-			)
+			).WithTheme(formTheme)
 			m.currentView = formView
 			return m, m.form.Init()
 		case "e":
@@ -53,7 +53,7 @@ func (m Model) updateCategory(msg tea.Msg) (tea.Model, tea.Cmd) {
 							Key("name").
 							Value(&editCatName),
 					),
-				)
+				).WithTheme(formTheme)
 				m.currentView = formView
 				return m, m.form.Init()
 			}

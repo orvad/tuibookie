@@ -28,6 +28,8 @@ func EnsureConfigDir(path string) error {
 
 type AppConfig struct {
 	BookmarksPath string `json:"bookmarks_path,omitempty"`
+	GistToken     string `json:"gist_token,omitempty"`
+	GistID        string `json:"gist_id,omitempty"`
 }
 
 func ConfigDir() string {

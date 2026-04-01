@@ -17,6 +17,7 @@ Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea), [Huh](https
 - **Interactive TUI** — Navigate bookmarks and categories with arrow keys
 - **Categories** — Add, rename, and delete categories
 - **Import/Export** — Back up your bookmarks to JSON and import from backup files
+- **Gist Sync** — Push your bookmarks to a secret GitHub Gist and pull them on any machine. Versioned backup with full revision history, powered by a Personal Access Token.
 - **Configurable storage** — Choose where your bookmarks file lives
 - **Any CLI command** — SSH, rsync, docker, kubectl, or any command you use regularly
 
@@ -147,6 +148,9 @@ Settings provides:
 - **Bookmarks file** — View and change the path to your bookmarks JSON file. When switching, you'll see a confirmation with the number of categories and bookmarks in the target file. If the file doesn't exist, you can create a new empty one.
 - **Export bookmarks** — Saves a backup to the current working directory as `bookmarks-backup-YYYY-MM-DD-HHMMSS.json`
 - **Import bookmarks** — Lists `.json` files in the current directory to choose from, or lets you enter a file path manually. Imported bookmarks are merged into existing categories.
+- **Push to Gist** — Uploads your bookmarks to a secret GitHub Gist. On first push, a new gist is created; subsequent pushes update it.
+- **Pull from Gist** — Downloads bookmarks from your gist and replaces the local file. Shows a confirmation with category and bookmark counts before overwriting.
+- **GitHub token** — Set or remove the Personal Access Token used for Gist sync. The token is stored in `config.json` and displayed masked in the UI.
 
 #### Forms (add/edit)
 
