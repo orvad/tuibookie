@@ -1,6 +1,8 @@
 package tui
 
 import (
+	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -9,6 +11,8 @@ import (
 	tea "charm.land/bubbletea/v2"
 
 	"example/tuibookie/internal/bookmark"
+	"example/tuibookie/internal/config"
+	"example/tuibookie/internal/gist"
 )
 
 // settingsItems are the selectable items in order. Section labels are rendered
@@ -17,10 +21,16 @@ var settingsItems = []string{
 	"Bookmarks file",
 	"Export bookmarks",
 	"Import bookmarks",
+	"Push to Gist",
+	"Pull from Gist",
+	"GitHub token",
 }
 
-// sectionBreak is the index where the DATA section starts (after Config items).
-const sectionBreak = 1
+// Section boundaries: CONFIG [0,dataBreak), DATA [dataBreak,syncBreak), SYNC [syncBreak,len)
+const (
+	dataBreak = 1
+	syncBreak = 3
+)
 
 func (m Model) updateSettings(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
@@ -56,7 +66,7 @@ func (m Model) updateSettings(msg tea.Msg) (tea.Model, tea.Cmd) {
 								Key("path").
 								Value(&m.pendingConfigPath),
 						),
-					)
+					).WithTheme(formTheme)
 					m.currentView = formView
 					return m, m.form.Init()
 				}
@@ -82,13 +92,107 @@ func (m Model) updateSettings(msg tea.Msg) (tea.Model, tea.Cmd) {
 							Key("path").
 							Options(options...),
 					),
-				)
+				).WithTheme(formTheme)
+				m.currentView = formView
+				return m, m.form.Init()
+			case 3: // Push to Gist
+				return m.pushToGist()
+			case 4: // Pull from Gist
+				return m.pullFromGist()
+			case 5: // GitHub token
+				m.formAction = formSetGistToken
+				m.pendingGistToken = m.gistToken
+				m.form = huh.NewForm(
+					huh.NewGroup(
+						huh.NewInput().
+							Title("GitHub Personal Access Token").
+							Key("token").
+							CharLimit(200).
+							Value(&m.pendingGistToken),
+					),
+				).WithTheme(formTheme).WithWidth(m.width)
 				m.currentView = formView
 				return m, m.form.Init()
 			}
 		}
 	}
 	return m, nil
+}
+
+func (m Model) pushToGist() (tea.Model, tea.Cmd) {
+	if m.gistToken == "" {
+		m.statusMsg = "Set GitHub token first"
+		return m, nil
+	}
+
+	data, err := json.MarshalIndent(m.bookmarks, "", "  ")
+	if err != nil {
+		m.statusMsg = "Failed to serialize: " + err.Error()
+		return m, nil
+	}
+
+	c := &gist.Client{Token: m.gistToken}
+
+	if m.gistID == "" {
+		id, err := c.Create(data)
+		if err != nil {
+			m.statusMsg = "Push failed: " + err.Error()
+			return m, nil
+		}
+		m.gistID = id
+		m.saveGistConfig()
+		m.statusMsg = fmt.Sprintf("Created gist %s", id[:8])
+	} else {
+		if err := c.Update(m.gistID, data); err != nil {
+			m.statusMsg = "Push failed: " + err.Error()
+			return m, nil
+		}
+		m.statusMsg = fmt.Sprintf("Pushed to gist %s", m.gistID[:min(8, len(m.gistID))])
+	}
+	return m, nil
+}
+
+func (m Model) pullFromGist() (tea.Model, tea.Cmd) {
+	if m.gistToken == "" {
+		m.statusMsg = "Set GitHub token first"
+		return m, nil
+	}
+	if m.gistID == "" {
+		m.statusMsg = "Push bookmarks first to create a gist"
+		return m, nil
+	}
+
+	c := &gist.Client{Token: m.gistToken}
+	data, err := c.Fetch(m.gistID)
+	if err != nil {
+		m.statusMsg = "Pull failed: " + err.Error()
+		return m, nil
+	}
+
+	var bm bookmark.Bookmarks
+	if err := json.Unmarshal(data, &bm); err != nil {
+		m.statusMsg = "Gist contains invalid bookmark data"
+		return m, nil
+	}
+
+	cats := bookmark.Categories(bm)
+	totalBookmarks := 0
+	for _, items := range bm {
+		totalBookmarks += len(items)
+	}
+
+	m.confirmMsg = fmt.Sprintf("Replace local bookmarks? (gist has %d categories, %d bookmarks)", len(cats), totalBookmarks)
+	m.confirmAction = formConfirmPull
+	m.confirmCursor = 0
+	m.currentView = confirmView
+	return m, nil
+}
+
+func (m *Model) saveGistConfig() {
+	appCfg, _ := config.LoadAppConfig(m.configDir)
+	appCfg.GistToken = m.gistToken
+	appCfg.GistID = m.gistID
+	config.SaveAppConfig(m.configDir, appCfg)
 }
 
 func (m Model) viewSettings() string {
@@ -102,7 +206,7 @@ func (m Model) viewSettings() string {
 	// CONFIG section
 	b.WriteString(dimStyle.Render("  CONFIG"))
 	b.WriteString("\n")
-	for i := 0; i < sectionBreak; i++ {
+	for i := 0; i < dataBreak; i++ {
 		label := settingsItems[i]
 		if i == 0 {
 			label = "Bookmarks file: " + truncatePath(m.configPath, 40)
@@ -119,7 +223,7 @@ func (m Model) viewSettings() string {
 	b.WriteString("\n")
 	b.WriteString(dimStyle.Render("  DATA"))
 	b.WriteString("\n")
-	for i := sectionBreak; i < len(settingsItems); i++ {
+	for i := dataBreak; i < syncBreak; i++ {
 		if i == m.settingsCursor {
 			b.WriteString(selectedStyle.Render("> " + settingsItems[i]))
 		} else {
@@ -128,9 +232,20 @@ func (m Model) viewSettings() string {
 		b.WriteString("\n")
 	}
 
-	if m.statusMsg != "" {
-		b.WriteString("\n")
-		b.WriteString(selectedStyle.Render(m.statusMsg))
+	// SYNC section
+	b.WriteString("\n")
+	b.WriteString(dimStyle.Render("  SYNC"))
+	b.WriteString("\n")
+	for i := syncBreak; i < len(settingsItems); i++ {
+		label := settingsItems[i]
+		if i == 5 {
+			label = "GitHub token: " + maskToken(m.gistToken)
+		}
+		if i == m.settingsCursor {
+			b.WriteString(selectedStyle.Render("> " + label))
+		} else {
+			b.WriteString(normalStyle.Render("  " + label))
+		}
 		b.WriteString("\n")
 	}
 
@@ -138,6 +253,16 @@ func (m Model) viewSettings() string {
 	b.WriteString(renderHelp("[enter/→] select  [←/esc] back  [q] quit"))
 
 	return b.String()
+}
+
+func maskToken(token string) string {
+	if token == "" {
+		return "(not set)"
+	}
+	if len(token) <= 4 {
+		return "****"
+	}
+	return "****" + token[len(token)-4:]
 }
 
 func truncatePath(path string, maxLen int) string {

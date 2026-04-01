@@ -8,7 +8,6 @@ import (
 	tea "charm.land/bubbletea/v2"
 
 	"example/tuibookie/internal/bookmark"
-	"example/tuibookie/internal/config"
 )
 
 func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -21,8 +20,10 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.currentView = categoryView
 			case formAddBookmark, formEditBookmark:
 				m.currentView = bookmarkView
-			case formImport, formImportManual, formChangeBookmarksPath, formConfirmBookmarksPath:
+			case formImport, formImportManual, formChangeBookmarksPath,
+				formSetGistToken:
 				m.pendingConfigPath = ""
+				m.pendingGistToken = ""
 				m.currentView = settingsView
 			}
 			m.form = nil
@@ -91,7 +92,7 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 							Title("Path to JSON file").
 							Key("path"),
 					),
-				)
+				).WithTheme(formTheme)
 				m.formAction = formImportManual
 				return m, m.form.Init()
 			}
@@ -128,16 +129,12 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 			bm, err := bookmark.Load(path)
 			if err != nil {
 				if os.IsNotExist(err) {
-					// File doesn't exist — ask to create
-					m.formAction = formConfirmBookmarksPath
-					m.form = huh.NewForm(
-						huh.NewGroup(
-							huh.NewConfirm().
-								Title("File not found. Create a new empty bookmarks file at this path?").
-								Key("confirm"),
-						),
-					)
-					return m, m.form.Init()
+					m.confirmMsg = "File not found. Create a new empty bookmarks file at this path?"
+					m.confirmAction = formConfirmBookmarksPath
+					m.confirmCursor = 0
+					m.currentView = confirmView
+					m.form = nil
+					return m, nil
 				}
 				m.pendingConfigPath = ""
 				m.statusMsg = "Invalid file: " + err.Error()
@@ -150,66 +147,25 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 			for _, items := range bm {
 				totalBookmarks += len(items)
 			}
-			m.formAction = formConfirmBookmarksPath
-			title := fmt.Sprintf("Switch to this file? (%d categories, %d bookmarks)", len(cats), totalBookmarks)
-			m.form = huh.NewForm(
-				huh.NewGroup(
-					huh.NewConfirm().
-						Title(title).
-						Key("confirm"),
-				),
-			)
-			return m, m.form.Init()
+			m.confirmMsg = fmt.Sprintf("Switch to this file? (%d categories, %d bookmarks)", len(cats), totalBookmarks)
+			m.confirmAction = formConfirmBookmarksPath
+			m.confirmCursor = 0
+			m.currentView = confirmView
+			m.form = nil
+			return m, nil
 
-		case formConfirmBookmarksPath:
-			confirmed := m.form.GetBool("confirm")
-			if !confirmed {
-				m.pendingConfigPath = ""
-				m.currentView = settingsView
-				break
+		case formSetGistToken:
+			token := m.form.GetString("token")
+			m.gistToken = token
+			m.saveGistConfig()
+			if token == "" {
+				m.statusMsg = "Token removed"
+			} else {
+				m.statusMsg = "Token saved"
 			}
-			path := m.pendingConfigPath
-			m.pendingConfigPath = ""
-
-			// Create file if it doesn't exist
-			if _, err := os.Stat(path); os.IsNotExist(err) {
-				if err := config.EnsureConfigDir(path); err != nil {
-					m.statusMsg = "Error creating directory: " + err.Error()
-					m.currentView = settingsView
-					break
-				}
-				if err := bookmark.Save(path, bookmark.Bookmarks{}); err != nil {
-					m.statusMsg = "Error creating file: " + err.Error()
-					m.currentView = settingsView
-					break
-				}
-			}
-
-			// Load bookmarks from new path
-			bm, err := bookmark.Load(path)
-			if err != nil {
-				m.statusMsg = "Error loading bookmarks: " + err.Error()
-				m.currentView = settingsView
-				break
-			}
-
-			// Save to config.json
-			appCfg := config.AppConfig{BookmarksPath: path}
-			if err := config.SaveAppConfig(m.configDir, appCfg); err != nil {
-				m.statusMsg = "Error saving config: " + err.Error()
-				m.currentView = settingsView
-				break
-			}
-
-			// Hot-reload
-			m.configPath = path
-			m.bookmarks = bm
-			m.pathSource = PathSourceConfig
-			m.refreshCategories()
-			m.catCursor = 0
-			m.bmCursor = 0
-			m.statusMsg = "Switched to " + path
+			m.pendingGistToken = ""
 			m.currentView = settingsView
+
 		}
 		m.form = nil
 	}
