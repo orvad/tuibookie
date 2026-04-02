@@ -147,9 +147,9 @@ func (m Model) View() tea.View {
 }
 
 func (m Model) title() string {
-	name := titleNameStyle.Render("◆ TuiBookie")
+	name := titlePrefixStyle.Render("Tui") + titleAccentStyle.Render("Bookie")
 	ver := titleVersionStyle.Render(" " + m.version)
-	left := "◆ TuiBookie " + m.version
+	left := "TuiBookie " + m.version
 	sep := titleSepStyle.Render(strings.Repeat("━", max(0, m.width-4)))
 
 	if m.statusMsg == "" {
