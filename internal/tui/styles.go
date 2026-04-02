@@ -8,9 +8,13 @@ import (
 )
 
 var (
-	titleNameStyle = lipgloss.NewStyle().
-			Bold(true).
-			Foreground(lipgloss.Color("#F92672"))
+	titlePrefixStyle = lipgloss.NewStyle().
+				Bold(true).
+				Foreground(lipgloss.Color("#E8E8E2"))
+
+	titleAccentStyle = lipgloss.NewStyle().
+				Bold(true).
+				Foreground(lipgloss.Color("#F92672"))
 
 	titleVersionStyle = lipgloss.NewStyle().
 				Foreground(lipgloss.Color("#75715E"))
