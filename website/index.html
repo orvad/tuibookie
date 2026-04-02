@@ -203,10 +203,19 @@
     }
 
     .screenshot-caption {
-      margin-top: 10px;
-      font-size: 13px;
-      color: var(--help);
+      margin-bottom: 16px;
+      font-size: 15px;
       text-align: left;
+    }
+
+    .screenshot-caption strong {
+      color: #ffffff;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .screenshot-caption .caption-desc {
+      color: var(--muted);
     }
 
     /* TUI Simulation */
@@ -486,6 +495,7 @@
       <h2 class="section-title">Organize. Navigate. Execute.</h2>
       <div class="screenshot-row">
         <div class="screenshot-item">
+          <div class="screenshot-caption"><strong>Browse categories</strong><span class="caption-desc">See all your command groups at a glance with bookmark counts.</span></div>
           <div class="terminal">
             <div class="terminal-bar">
               <div class="terminal-dot red"></div>
@@ -499,16 +509,16 @@
                 <div class="tui-selected">&gt; Deployments (3)</div>
                 <div>&nbsp; Docker (4)</div>
                 <div>&nbsp; Kubernetes (3)</div>
-                <div>&nbsp; Monitoring (2)</div>
+                <div>&nbsp; FFmpeg (9)</div>
                 <div>&nbsp; Production servers (3)</div>
                 <div>&nbsp; Staging servers (2)</div>
                 <div class="tui-help"><span>[a]</span>dd <span>[e]</span>dit <span>[d]</span>elete <span>[s]</span>ettings <span>[enter/&rarr;]</span> open <span>[q/esc]</span> quit</div>
               </div>
             </div>
           </div>
-          <div class="screenshot-caption">Browse categories</div>
         </div>
         <div class="screenshot-item">
+          <div class="screenshot-caption"><strong>Browse bookmarks</strong><span class="caption-desc">Drill into a category to see commands. Select one and press Enter to run it.</span></div>
           <div class="terminal">
             <div class="terminal-bar">
               <div class="terminal-dot red"></div>
@@ -527,9 +537,9 @@
               </div>
             </div>
           </div>
-          <div class="screenshot-caption">Run bookmarked commands</div>
         </div>
         <div class="screenshot-item">
+          <div class="screenshot-caption"><strong>Settings</strong><span class="caption-desc">Configure your bookmarks file path, export backups, or import from a JSON file.</span></div>
           <div class="terminal">
             <div class="terminal-bar">
               <div class="terminal-dot red"></div>
@@ -556,7 +566,6 @@
               </div>
             </div>
           </div>
-          <div class="screenshot-caption">Configure storage, import/export, and sync to GitHub Gist</div>
         </div>
       </div>
     </section>
