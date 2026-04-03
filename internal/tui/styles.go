@@ -22,6 +22,7 @@ var (
 	statusMsgStyle       lipgloss.Style
 	paramStyle           lipgloss.Style
 	confirmIndicatorStyle lipgloss.Style
+	sectionHeaderStyle   lipgloss.Style
 	formTheme            huh.Theme
 )
 
@@ -81,6 +82,7 @@ func applyPalette(accent, green, yellow, text, muted, help, param, blurredBg, ti
 	statusMsgStyle = lipgloss.NewStyle().Foreground(green)
 	paramStyle = lipgloss.NewStyle().Foreground(param)
 	confirmIndicatorStyle = lipgloss.NewStyle().Foreground(accent).Bold(true)
+	sectionHeaderStyle = lipgloss.NewStyle().Foreground(muted).Bold(true)
 
 	formTheme = huh.ThemeFunc(func(_ bool) *huh.Styles {
 		t := huh.ThemeBase(isDark)
