@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -106,6 +107,51 @@ func Import(path string, bm Bookmarks) error {
 		}
 	}
 	return nil
+}
+
+// Param represents a named parameter extracted from a command template.
+type Param struct {
+	Name    string
+	Default string
+}
+
+var ParamRegex = regexp.MustCompile(`\{\{(\w+)(?::([^}]*))?\}\}`)
+
+// ParseParams extracts parameters from a command string containing {{name}} or
+// {{name:default}} placeholders. Returns unique params in order of first appearance.
+func ParseParams(cmd string) []Param {
+	matches := ParamRegex.FindAllStringSubmatch(cmd, -1)
+	if len(matches) == 0 {
+		return nil
+	}
+
+	seen := make(map[string]bool)
+	var params []Param
+	for _, m := range matches {
+		name := m[1]
+		if seen[name] {
+			continue
+		}
+		seen[name] = true
+		params = append(params, Param{Name: name, Default: m[2]})
+	}
+	return params
+}
+
+// ResolveParams replaces all {{name}} and {{name:default}} placeholders in cmd
+// with the corresponding values from the provided map.
+func ResolveParams(cmd string, values map[string]string) string {
+	return ParamRegex.ReplaceAllStringFunc(cmd, func(match string) string {
+		sub := ParamRegex.FindStringSubmatch(match)
+		if sub == nil {
+			return match
+		}
+		name := sub[1]
+		if val, ok := values[name]; ok {
+			return val
+		}
+		return match
+	})
 }
 
 func Export(bm Bookmarks) (string, error) {

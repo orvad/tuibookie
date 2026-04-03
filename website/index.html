@@ -39,6 +39,7 @@
       --terminal-bg: #1a1a1a;
       --border: #3e3d40;
       --yellow: #e6db74;
+      --orange: #c87a1a;
       --mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
     }
 
@@ -271,6 +272,9 @@
     .tui-cmd {
       color: var(--help);
       margin-left: 2px;
+    }
+    .tui-param {
+      color: var(--orange);
     }
 
     .tui-help {
@@ -543,6 +547,27 @@
           </div>
         </div>
         <div class="screenshot-item">
+          <div class="screenshot-caption"><strong>Parameterized commands</strong><span class="caption-desc">Add variables to any command. TuiBookie prompts you for each value before running.</span></div>
+          <div class="terminal">
+            <div class="terminal-bar">
+              <div class="terminal-dot red"></div>
+              <div class="terminal-dot yellow"></div>
+              <div class="terminal-dot green"></div>
+            </div>
+            <div class="terminal-body">
+              <div class="tui">
+                <div class="tui-badge"><span class="tui-title-prefix">Tui</span><span class="tui-title-name">Bookie</span> <span class="tui-title-ver"><!--VERSION-->v1.2.2<!--/VERSION--></span></div>
+                <div class="tui-sep">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+                <div class="tui-heading">Staging servers</div>
+                <div class="tui-selected">&gt; app <span class="tui-cmd">ssh <span class="tui-param">admin</span>@<span class="tui-param">server</span></span></div>
+                <div>&nbsp; copy stuff <span class="tui-cmd">cp -r <span class="tui-param">somefolder</span> <span class="tui-param">someotherfolder</span></span></div>
+                <div>&nbsp; database <span class="tui-cmd">ssh dev@staging-db.example.com</span></div>
+                <div class="tui-help"><span>[a]</span>dd <span>[e]</span>dit <span>[d]</span>elete <span>[enter]</span> run <span>[&larr;/esc]</span> back <span>[q]</span>uit</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="screenshot-item">
           <div class="screenshot-caption"><strong>Settings</strong><span class="caption-desc">Configure your bookmarks file path, export backups, or import from a JSON file.</span></div>
           <div class="terminal">
             <div class="terminal-bar">
@@ -618,9 +643,9 @@
           <p>Change your bookmarks file path right from Settings. Or use --config flag and env var for scripting.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon"><span style="color:var(--accent)">&#9632;</span><span style="color:var(--green)">&#9632;</span><span style="color:var(--yellow)">&#9632;</span><span style="color:var(--muted)">&#9632;</span><span style="color:var(--help)">&#9632;</span></div>
-          <h3>Monokai Theme</h3>
-          <p>Beautiful dark color scheme with pink accents and green highlights. Easy on the eyes.</p>
+          <div class="feature-icon" style="font-size:22px"><span style="color:var(--green)">{{</span><span style="color:var(--orange)">&thinsp;</span><span style="color:var(--green)">}}</span></div>
+          <h3>Parameterized</h3>
+          <p>Add <span style="color:var(--orange)">{{variables}}</span> to any command. Fill in values at run time with a live-updating preview.</p>
         </div>
       </div>
     </section>

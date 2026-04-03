@@ -34,6 +34,7 @@ const (
 	formConfirmBookmarksPath
 	formSetGistToken
 	formConfirmPull
+	formRunParam
 )
 
 type PathSource int
@@ -69,6 +70,9 @@ type Model struct {
 	confirmMsg        string
 	confirmAction     formAction
 	confirmCursor     int // 0=Yes, 1=No
+	pendingCmd        string
+	pendingParams     []bookmark.Param
+	paramValues       map[string]*string
 	width             int
 	height            int
 }

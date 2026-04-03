@@ -3,6 +3,8 @@ package tui
 import (
 	"fmt"
 	"os"
+	"os/exec"
+	"strings"
 
 	"charm.land/huh/v2"
 	tea "charm.land/bubbletea/v2"
@@ -18,7 +20,10 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 			switch m.formAction {
 			case formAddCategory, formEditCategory:
 				m.currentView = categoryView
-			case formAddBookmark, formEditBookmark:
+			case formAddBookmark, formEditBookmark, formRunParam:
+				m.pendingCmd = ""
+				m.pendingParams = nil
+				m.paramValues = nil
 				m.currentView = bookmarkView
 			case formImport, formImportManual, formChangeBookmarksPath,
 				formSetGistToken:
@@ -29,6 +34,11 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.form = nil
 			return m, nil
 		}
+	}
+
+	if m.form == nil {
+		m.currentView = bookmarkView
+		return m, nil
 	}
 
 	form, cmd := m.form.Update(msg)
@@ -166,6 +176,24 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.pendingGistToken = ""
 			m.currentView = settingsView
 
+		case formRunParam:
+			values := make(map[string]string)
+			for _, p := range m.pendingParams {
+				values[p.Name] = m.form.GetString(p.Name)
+			}
+			resolved := bookmark.ResolveParams(m.pendingCmd, values)
+			m.pendingCmd = ""
+			m.pendingParams = nil
+			m.paramValues = nil
+			m.currentView = bookmarkView
+			parts := strings.Fields(resolved)
+			if len(parts) > 0 {
+				c := exec.Command(parts[0], parts[1:]...)
+				return m, tea.ExecProcess(c, func(err error) tea.Msg {
+					return execDoneMsg{err: err}
+				})
+			}
+
 		}
 		m.form = nil
 	}
@@ -177,5 +205,11 @@ func (m Model) viewForm() string {
 	if m.form == nil {
 		return ""
 	}
-	return m.title() + "\n\n" + m.form.View()
+	s := m.title() + "\n\n"
+	if m.formAction == formRunParam && m.pendingCmd != "" {
+		label := selectedStyle.Render("Command: ")
+		s += "  " + label + renderLiveCmd(m.pendingCmd, m.paramValues) + "\n\n"
+	}
+	s += m.form.View()
+	return s
 }
