@@ -19,6 +19,7 @@ import (
 // separately in viewSettings and are not part of this list.
 var settingsItems = []string{
 	"Bookmarks file",
+	"Theme",
 	"Export bookmarks",
 	"Import bookmarks",
 	"Push to Gist",
@@ -28,8 +29,8 @@ var settingsItems = []string{
 
 // Section boundaries: CONFIG [0,dataBreak), DATA [dataBreak,syncBreak), SYNC [syncBreak,len)
 const (
-	dataBreak = 1
-	syncBreak = 3
+	dataBreak = 2
+	syncBreak = 4
 )
 
 func (m Model) updateSettings(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -70,14 +71,16 @@ func (m Model) updateSettings(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.currentView = formView
 					return m, m.form.Init()
 				}
-			case 1: // Export
+			case 1: // Theme
+				m.cycleTheme()
+			case 2: // Export
 				filename, err := bookmark.Export(m.bookmarks)
 				if err != nil {
 					m.statusMsg = "Export failed: " + err.Error()
 				} else {
 					m.statusMsg = "Exported to " + filename
 				}
-			case 2: // Import
+			case 3: // Import
 				m.formAction = formImport
 				jsonFiles := findJSONFiles()
 				options := make([]huh.Option[string], 0, len(jsonFiles)+1)
@@ -95,11 +98,11 @@ func (m Model) updateSettings(msg tea.Msg) (tea.Model, tea.Cmd) {
 				).WithTheme(formTheme)
 				m.currentView = formView
 				return m, m.form.Init()
-			case 3: // Push to Gist
+			case 4: // Push to Gist
 				return m.pushToGist()
-			case 4: // Pull from Gist
+			case 5: // Pull from Gist
 				return m.pullFromGist()
-			case 5: // GitHub token
+			case 6: // GitHub token
 				m.formAction = formSetGistToken
 				m.pendingGistToken = m.gistToken
 				m.form = huh.NewForm(
@@ -211,6 +214,9 @@ func (m Model) viewSettings() string {
 		if i == 0 {
 			label = "Bookmarks file: " + truncatePath(m.configPath, 40)
 		}
+		if i == 1 {
+			label = "Theme: " + m.themeSetting
+		}
 		if i == m.settingsCursor {
 			b.WriteString(selectedStyle.Render("> " + label))
 		} else {
@@ -238,7 +244,7 @@ func (m Model) viewSettings() string {
 	b.WriteString("\n")
 	for i := syncBreak; i < len(settingsItems); i++ {
 		label := settingsItems[i]
-		if i == 5 {
+		if i == 6 {
 			label = "GitHub token: " + maskToken(m.gistToken)
 		}
 		if i == m.settingsCursor {
@@ -253,6 +259,23 @@ func (m Model) viewSettings() string {
 	b.WriteString(renderHelp("[enter/→] select  [←/esc] back  [q] quit"))
 
 	return b.String()
+}
+
+func (m *Model) cycleTheme() {
+	switch m.themeSetting {
+	case "auto":
+		m.themeSetting = "dark"
+	case "dark":
+		m.themeSetting = "light"
+	default:
+		m.themeSetting = "auto"
+	}
+	m.isDark = resolveTheme(m.themeSetting, m.autoDetectedDark)
+	ApplyTheme(m.isDark)
+	appCfg, _ := config.LoadAppConfig(m.configDir)
+	appCfg.Theme = m.themeSetting
+	config.SaveAppConfig(m.configDir, appCfg)
+	m.statusMsg = "Theme: " + m.themeSetting
 }
 
 func maskToken(token string) string {
