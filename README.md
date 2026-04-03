@@ -126,7 +126,7 @@ In the bookmark list, parameters are highlighted so you can tell at a glance whi
 
 ## Confirm before execute
 
-Individual bookmarks can be marked to require confirmation before running. When you add or edit a bookmark, set **"Confirm before execute?"** to Yes. Bookmarks with confirmation enabled show a bold pink **!** indicator in the list, and pressing Enter will display the resolved command in a confirmation dialog — you must confirm with `y` before it runs. This is useful for dangerous commands like `rm -rf`, `kubectl delete`, or anything you don't want to fire accidentally.
+By default, commands fire immediately when you press Enter — that's the whole point of TuiBookie. But some commands are dangerous, and you may want a safety net before running them. Individual bookmarks can be marked to require confirmation: when you add or edit a bookmark, set **"Confirm before execute?"** to Yes. Bookmarks with confirmation enabled show a bold pink **!** indicator in the list, and pressing Enter will display the resolved command in a confirmation dialog — you must confirm with `y` before it runs. This is useful for commands like `rm -rf`, `kubectl delete`, or anything you don't want to fire accidentally.
 
 ## Settings provides:
 
