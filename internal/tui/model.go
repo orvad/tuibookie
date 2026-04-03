@@ -2,9 +2,11 @@ package tui
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"charm.land/huh/v2"
+	"charm.land/lipgloss/v2"
 	tea "charm.land/bubbletea/v2"
 
 	"github.com/orvad/tuibookie/internal/bookmark"
@@ -74,27 +76,52 @@ type Model struct {
 	pendingCmd        string
 	pendingParams     []bookmark.Param
 	paramValues       map[string]*string
+	themeSetting      string // "auto", "dark", "light"
+	isDark            bool
+	autoDetectedDark  bool   // cached terminal detection from startup
 	width             int
 	height            int
 }
 
 func NewModel(bm bookmark.Bookmarks, configPath string, configDir string, pathSource PathSource, version string) Model {
 	cats := bookmark.Categories(bm)
-	var gistToken, gistID string
+	var gistToken, gistID, themeSetting string
 	if appCfg, err := config.LoadAppConfig(configDir); err == nil {
 		gistToken = appCfg.GistToken
 		gistID = appCfg.GistID
+		themeSetting = appCfg.Theme
 	}
+	if themeSetting == "" {
+		themeSetting = "auto"
+	}
+	// Detect terminal background once before Bubble Tea takes over stdin.
+	autoDetectedDark := lipgloss.HasDarkBackground(os.Stdin, os.Stdout)
+	isDark := resolveTheme(themeSetting, autoDetectedDark)
+	ApplyTheme(isDark)
 	return Model{
-		bookmarks:   bm,
-		configPath:  configPath,
-		configDir:   configDir,
-		pathSource:  pathSource,
-		version:     version,
-		currentView: categoryView,
-		categories:  cats,
-		gistToken:   gistToken,
-		gistID:      gistID,
+		bookmarks:        bm,
+		configPath:       configPath,
+		configDir:        configDir,
+		pathSource:       pathSource,
+		version:          version,
+		currentView:      categoryView,
+		categories:       cats,
+		gistToken:        gistToken,
+		gistID:           gistID,
+		themeSetting:     themeSetting,
+		isDark:           isDark,
+		autoDetectedDark: autoDetectedDark,
+	}
+}
+
+func resolveTheme(setting string, autoDetectedDark bool) bool {
+	switch setting {
+	case "dark":
+		return true
+	case "light":
+		return false
+	default:
+		return autoDetectedDark
 	}
 }
 
