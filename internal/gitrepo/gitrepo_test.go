@@ -30,6 +30,12 @@ func initBareRepo(t *testing.T, content string) string {
 	return bare
 }
 
+func configGitUser(t *testing.T, repoDir string) {
+	t.Helper()
+	run(t, repoDir, "git", "config", "user.email", "test@test.com")
+	run(t, repoDir, "git", "config", "user.name", "Test")
+}
+
 func run(t *testing.T, dir string, name string, args ...string) {
 	t.Helper()
 	cmd := exec.Command(name, args...)
@@ -129,6 +135,7 @@ func TestCommitAndPush(t *testing.T) {
 	if err := Clone(bare, cloneDir); err != nil {
 		t.Fatal(err)
 	}
+	configGitUser(t, cloneDir)
 
 	if err := os.WriteFile(filepath.Join(cloneDir, "bookmarks.json"), []byte(`{"v2":[]}`), 0644); err != nil {
 		t.Fatal(err)
@@ -173,6 +180,7 @@ func TestResetToRemote(t *testing.T) {
 	if err := Clone(bare, cloneDir); err != nil {
 		t.Fatal(err)
 	}
+	configGitUser(t, cloneDir)
 
 	if err := os.WriteFile(filepath.Join(cloneDir, "bookmarks.json"), []byte(`{"local":[]}`), 0644); err != nil {
 		t.Fatal(err)
