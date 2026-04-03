@@ -31,7 +31,8 @@ func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case "enter":
 			if len(items) > 0 {
-				cmd := items[m.bmCursor].Cmd
+				bm := items[m.bmCursor]
+				cmd := bm.Cmd
 				params := bookmark.ParseParams(cmd)
 				if len(params) > 0 {
 					m.pendingCmd = cmd
@@ -52,6 +53,14 @@ func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
 					).WithTheme(formTheme)
 					m.currentView = formView
 					return m, m.form.Init()
+				}
+				if bm.Confirm {
+					m.pendingCmd = cmd
+					m.confirmMsg = "Execute: " + cmd + "?"
+					m.confirmAction = formConfirmExec
+					m.confirmCursor = 0
+					m.currentView = confirmView
+					return m, nil
 				}
 				parts := strings.Fields(cmd)
 				if len(parts) > 0 {
@@ -160,10 +169,14 @@ func (m Model) viewBookmark() string {
 		b.WriteString("\n")
 	} else {
 		for i, bm := range items {
+			indicator := ""
+			if bm.Confirm {
+				indicator = " " + confirmIndicatorStyle.Render("!")
+			}
 			if i == m.bmCursor {
-				b.WriteString(selectedStyle.Render("> "+bm.Name) + "  " + renderCmd(bm.Cmd))
+				b.WriteString(selectedStyle.Render("> "+bm.Name) + indicator + "  " + renderCmd(bm.Cmd))
 			} else {
-				b.WriteString(normalStyle.Render("  "+bm.Name) + "  " + renderCmd(bm.Cmd))
+				b.WriteString(normalStyle.Render("  "+bm.Name) + indicator + "  " + renderCmd(bm.Cmd))
 			}
 			b.WriteString("\n")
 		}
