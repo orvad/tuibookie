@@ -3,6 +3,7 @@ package tui
 import (
 	"encoding/json"
 	"os"
+	"os/exec"
 	"strings"
 
 	tea "charm.land/bubbletea/v2"
@@ -46,8 +47,13 @@ func (m Model) updateConfirm(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Model) resolveConfirm() (tea.Model, tea.Cmd) {
 	confirmed := m.confirmCursor == 0
 	if !confirmed {
-		m.pendingConfigPath = ""
-		m.currentView = settingsView
+		if m.confirmAction == formConfirmExec {
+			m.pendingCmd = ""
+			m.currentView = bookmarkView
+		} else {
+			m.pendingConfigPath = ""
+			m.currentView = settingsView
+		}
 		return m, nil
 	}
 	return m.onConfirm()
@@ -122,6 +128,18 @@ func (m Model) onConfirm() (tea.Model, tea.Cmd) {
 		m.bmCursor = 0
 		m.statusMsg = "Pulled from gist"
 		m.currentView = settingsView
+
+	case formConfirmExec:
+		cmd := m.pendingCmd
+		m.pendingCmd = ""
+		parts := strings.Fields(cmd)
+		if len(parts) > 0 {
+			c := exec.Command(parts[0], parts[1:]...)
+			return m, tea.ExecProcess(c, func(err error) tea.Msg {
+				return execDoneMsg{err: err}
+			})
+		}
+		m.currentView = bookmarkView
 	}
 
 	return m, nil
