@@ -53,6 +53,16 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch m.formAction {
 		case formAddCategory:
 			if name != "" {
+				if m.isSharedContext {
+					bookmark.AddCategory(m.sharedBookmarks, name)
+					m.refreshSharedCategories()
+					m.saveShared()
+					m.selectedCat = name
+					m.bmCursor = 0
+					m.currentView = bookmarkView
+					m.form = nil
+					return m, m.pushSharedCmd("add category: " + name)
+				}
 				bookmark.AddCategory(m.bookmarks, name)
 				m.refreshCategories()
 				m.save()
@@ -65,6 +75,19 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case formEditCategory:
 			if name != "" {
+				if m.isSharedContext {
+					_, shared := m.categoryAtCursor()
+					if shared {
+						sharedIdx := m.catCursor - len(m.categories)
+						oldName := m.sharedCategories[sharedIdx]
+						bookmark.RenameCategory(m.sharedBookmarks, oldName, name)
+						m.refreshSharedCategories()
+						m.saveShared()
+						m.currentView = categoryView
+						m.form = nil
+						return m, m.pushSharedCmd("rename category: " + oldName + " -> " + name)
+					}
+				}
 				oldName := m.categories[m.catCursor]
 				bookmark.RenameCategory(m.bookmarks, oldName, name)
 				m.refreshCategories()
@@ -74,22 +97,38 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case formAddBookmark:
 			if name != "" && cmd != "" {
-				bookmark.AddBookmark(m.bookmarks, m.selectedCat, bookmark.Bookmark{
+				newBm := bookmark.Bookmark{
 					Name:    name,
 					Cmd:     cmd,
 					Confirm: m.form.GetBool("confirm"),
-				})
+				}
+				if m.isSharedContext {
+					bookmark.AddBookmark(m.sharedBookmarks, m.selectedCat, newBm)
+					m.saveShared()
+					m.currentView = bookmarkView
+					m.form = nil
+					return m, m.pushSharedCmd("add bookmark: " + name)
+				}
+				bookmark.AddBookmark(m.bookmarks, m.selectedCat, newBm)
 				m.save()
 			}
 			m.currentView = bookmarkView
 
 		case formEditBookmark:
 			if name != "" && cmd != "" {
-				bookmark.UpdateBookmark(m.bookmarks, m.selectedCat, m.editIndex, bookmark.Bookmark{
+				updatedBm := bookmark.Bookmark{
 					Name:    name,
 					Cmd:     cmd,
 					Confirm: m.form.GetBool("confirm"),
-				})
+				}
+				if m.isSharedContext {
+					bookmark.UpdateBookmark(m.sharedBookmarks, m.selectedCat, m.editIndex, updatedBm)
+					m.saveShared()
+					m.currentView = bookmarkView
+					m.form = nil
+					return m, m.pushSharedCmd("edit bookmark: " + name)
+				}
+				bookmark.UpdateBookmark(m.bookmarks, m.selectedCat, m.editIndex, updatedBm)
 				m.save()
 			}
 			m.currentView = bookmarkView
