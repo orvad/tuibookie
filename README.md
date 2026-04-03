@@ -18,7 +18,7 @@ Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea), [Huh](https
 - **Categories** — Add, rename, and delete categories
 - **Import/Export** — Back up your bookmarks to JSON and import from backup files
 - **Gist Sync** — Push your bookmarks to a secret GitHub Gist and pull them on any machine. Versioned backup with full revision history, powered by a Personal Access Token.
-- **Shared Bookmarks via Git** — Sync shared bookmarks from any git repo for collaborative work. Shared bookmarks appear alongside your local ones with clear section headers, and read-only repos are detected automatically.
+- **Shared Bookmarks via Git** — Sync shared bookmarks from any git repo for collaborative work. Read-only repos are detected automatically.
 - **Configurable storage** — Choose where your bookmarks file lives
 - **Any CLI command** — SSH, rsync, docker, kubectl, or any command you use regularly
 
@@ -34,7 +34,7 @@ Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea), [Huh](https
 
 **Settings** — Configure your bookmarks file path, export backups, or import from a JSON file.
 
-<img src="examples/screenshot-03.png" alt="Settings" width="600">
+<img src="examples/screenshot-settings.png" alt="Settings" width="600">
 
 **Parameterized commands** — Define reusable parameters in your commands and fill them in at run time.
 
