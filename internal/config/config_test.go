@@ -154,3 +154,49 @@ func TestSaveAppConfigCreatesDir(t *testing.T) {
 		t.Fatalf("config.json not created: %v", err)
 	}
 }
+
+func TestSaveAndLoadSharedRepoConfig(t *testing.T) {
+	dir := t.TempDir()
+	cfg := AppConfig{
+		SharedRepo:     "git@github.com:team/bookmarks.git",
+		SharedFilePath: "shared/bookmarks.json",
+		SharedReadOnly: true,
+	}
+	if err := SaveAppConfig(dir, cfg); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	loaded, err := LoadAppConfig(dir)
+	if err != nil {
+		t.Fatalf("unexpected error loading: %v", err)
+	}
+	if loaded.SharedRepo != "git@github.com:team/bookmarks.git" {
+		t.Fatalf("expected shared repo URL, got %s", loaded.SharedRepo)
+	}
+	if loaded.SharedFilePath != "shared/bookmarks.json" {
+		t.Fatalf("expected shared file path, got %s", loaded.SharedFilePath)
+	}
+	if !loaded.SharedReadOnly {
+		t.Fatal("expected SharedReadOnly to be true")
+	}
+}
+
+func TestSharedRepoConfigOmittedWhenEmpty(t *testing.T) {
+	dir := t.TempDir()
+	cfg := AppConfig{BookmarksPath: "/tmp/bm.json"}
+	if err := SaveAppConfig(dir, cfg); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	loaded, err := LoadAppConfig(dir)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if loaded.SharedRepo != "" {
+		t.Fatalf("expected empty SharedRepo, got %s", loaded.SharedRepo)
+	}
+	if loaded.SharedFilePath != "" {
+		t.Fatalf("expected empty SharedFilePath, got %s", loaded.SharedFilePath)
+	}
+	if loaded.SharedReadOnly {
+		t.Fatal("expected SharedReadOnly to be false")
+	}
+}

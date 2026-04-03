@@ -1,703 +1,946 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TuiBookie — SSH &amp; CLI Command Bookmark Manager for the Terminal</title>
-  <meta name="description" content="Save, organize, and run your SSH connections, Docker commands, and CLI workflows from a beautiful terminal UI. Free, open-source bookmark manager for the command line.">
-  <meta name="keywords" content="SSH bookmark manager, CLI command organizer, terminal bookmark, command line tool, TUI, SSH manager, Docker commands, kubectl bookmarks, shell command manager">
-  <link rel="canonical" href="https://tuibookie.dev">
-  <meta property="og:title" content="TuiBookie — SSH &amp; CLI Command Bookmark Manager for the Terminal">
-  <meta property="og:description" content="Save, organize, and run your SSH connections, Docker commands, and CLI workflows from a beautiful terminal UI.">
-  <meta property="og:image" content="https://tuibookie.dev/assets/tuibookie-logo.png">
-  <meta property="og:url" content="https://tuibookie.dev">
-  <meta property="og:type" content="website">
-  <link rel="icon" type="image/png" href="assets/tuibookie-logo.png">
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "TuiBookie",
-    "description": "A fast, beautiful TUI bookmark manager for SSH connections and CLI commands. Organize, navigate, and execute with style.",
-    "applicationCategory": "DeveloperApplication",
-    "operatingSystem": "macOS, Linux",
-    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-    "license": "https://opensource.org/licenses/MIT",
-    "url": "https://tuibookie.dev",
-    "downloadUrl": "https://github.com/orvad/tuibookie/releases"
-  }
-  </script>
-  <style>
-    :root {
-      --bg: #2d2a2e;
-      --surface: #383539;
-      --text: #f8f8f2;
-      --accent: #f92672;
-      --green: #a6e22e;
-      --muted: #a59f85;
-      --help: #75715e;
-      --terminal-bg: #1a1a1a;
-      --border: #3e3d40;
-      --yellow: #e6db74;
-      --orange: #c87a1a;
-      --mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      line-height: 1.6;
-    }
-
-    .container {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    code, .mono {
-      font-family: var(--mono);
-    }
-
-    .section-label {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: var(--accent);
-      margin-bottom: 8px;
-    }
-
-    .section-title {
-      font-size: 28px;
-      font-weight: 600;
-      margin-bottom: 40px;
-    }
-
-    /* Hero */
-    .hero {
-      padding: 80px 0 60px;
-      text-align: center;
-    }
-
-    .hero .install-cmd {
-      display: inline-flex;
-    }
-
-    .hero-logo {
-      width: 64px;
-      height: 64px;
-      margin: 0 auto 16px;
-      display: block;
-    }
-
-    .hero h1 {
-      font-size: 42px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      margin-bottom: 8px;
-    }
-
-    .hero h1 span {
-      color: var(--accent);
-    }
-
-    .hero .tagline {
-      font-size: 18px;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-
-    .install-cmd {
-      background: var(--terminal-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 14px 20px;
-      font-family: var(--mono);
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      max-width: 520px;
-    }
-
-    .install-cmd code {
-      color: var(--green);
-    }
-
-    .copy-btn {
-      background: var(--surface);
-      border: none;
-      color: var(--help);
-      padding: 4px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 12px;
-      font-family: inherit;
-    }
-
-    .copy-btn:hover {
-      color: var(--text);
-    }
-
-    /* Terminal Chrome */
-    .terminal {
-      background: var(--terminal-bg);
-      border-radius: 10px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
-
-    .terminal-bar {
-      background: var(--surface);
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .terminal-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-    }
-
-    .terminal-dot.red { background: var(--accent); }
-    .terminal-dot.yellow { background: var(--yellow); }
-    .terminal-dot.green { background: var(--green); }
-
-    .terminal-title {
-      flex: 1;
-      text-align: center;
-      font-size: 12px;
-      color: var(--help);
-      font-family: var(--mono);
-    }
-
-    .terminal-body {
-      padding: 4px;
-    }
-
-
-    /* Screenshots */
-    .screenshots {
-      padding: 60px 0;
-    }
-
-    .screenshots > .section-label,
-    .screenshots > .section-title {
-      text-align: center;
-    }
-
-    .screenshot-row {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      align-items: center;
-    }
-
-    .screenshot-item {
-      width: 100%;
-      max-width: 560px;
-    }
-
-    .screenshot-caption {
-      margin-bottom: 16px;
-      font-size: 15px;
-      text-align: left;
-    }
-
-    .screenshot-caption strong {
-      color: #ffffff;
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    .screenshot-caption .caption-desc {
-      color: var(--muted);
-    }
-
-    /* TUI Simulation */
-    .tui {
-      background: #1A1A1A;
-      padding: 16px 20px;
-      font-family: var(--mono);
-      font-size: 13px;
-      line-height: 1.8;
-      color: var(--muted);
-      min-height: 200px;
-      display: flex;
-      flex-direction: column;
-      white-space: nowrap;
-      overflow-x: auto;
-    }
-
-    .tui-badge {
-      display: block;
-      font-size: 12px;
-      margin-bottom: 4px;
-    }
-    .tui-badge .tui-title-prefix {
-      color: #C0BDB8;
-      font-weight: bold;
-    }
-    .tui-badge .tui-title-name {
-      color: var(--accent);
-      font-weight: bold;
-    }
-    .tui-badge .tui-title-ver {
-      color: var(--help);
-    }
-    .tui-sep {
-      color: var(--help);
-      margin-bottom: 12px;
-      letter-spacing: -1px;
-      overflow: hidden;
-      white-space: nowrap;
-    }
-
-    .tui-heading {
-      color: var(--green);
-      font-weight: bold;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-
-    .tui-selected {
-      color: var(--green);
-    }
-
-    .tui-cmd {
-      color: var(--help);
-      margin-left: 2px;
-    }
-    .tui-param {
-      color: var(--orange);
-    }
-
-    .tui-help {
-      color: var(--help);
-      font-size: 11px;
-      margin-top: auto;
-      padding-top: 12px;
-    }
-
-    .tui-help span {
-      color: var(--yellow);
-    }
-
-    /* Features */
-    .features {
-      padding: 60px 0;
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-
-    .feature-card {
-      background: var(--surface);
-      border-radius: 10px;
-      padding: 24px;
-      border: 1px solid var(--border);
-    }
-
-    .feature-icon {
-      font-size: 24px;
-      height: 36px;
-      margin-bottom: 12px;
-      color: var(--green);
-      font-family: var(--mono);
-      font-weight: bold;
-      display: flex;
-      align-items: flex-end;
-    }
-
-    .feature-card h3 {
-      font-size: 16px;
-      margin-bottom: 6px;
-    }
-
-    .feature-card p {
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    /* Why */
-    .why {
-      padding: 60px 0;
-    }
-
-    .why > .section-label,
-    .why > .section-title {
-      text-align: center;
-    }
-
-    .why-text {
-      max-width: 560px;
-      margin: 0 auto;
-      font-size: 16px;
-      line-height: 1.8;
-      color: var(--muted);
-    }
-
-    .why-text p {
-      margin-bottom: 16px;
-    }
-
-    .why-text strong {
-      color: var(--text);
-    }
-
-    /* Install */
-    .install-section {
-      padding: 60px 0;
-      text-align: center;
-    }
-
-    .install-methods {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      align-items: center;
-      margin-top: 32px;
-    }
-
-    .install-method {
-      background: var(--terminal-bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 20px 24px;
-      width: 100%;
-      max-width: 560px;
-      text-align: left;
-    }
-
-    .install-method .method-label {
-      font-size: 12px;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 10px;
-    }
-
-    .install-method code {
-      font-size: 13px;
-      color: var(--green);
-      word-break: break-all;
-      white-space: pre-line;
-    }
-
-    .install-method .copy-btn {
-      margin-top: 12px;
-      display: block;
-    }
-
-    /* GitHub CTA */
-    .github-cta {
-      padding: 40px 0;
-      text-align: center;
-    }
-
-    .github-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-size: 15px;
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    .github-btn:hover {
-      border-color: var(--green);
-    }
-
-    /* Footer */
-    footer {
-      padding: 32px 0;
-      text-align: center;
-      color: var(--help);
-      font-size: 13px;
-      border-top: 1px solid var(--border);
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .hero {
-        padding: 48px 0 40px;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      TuiBookie — SSH &amp; CLI Command Bookmark Manager for the Terminal
+    </title>
+    <meta
+      name="description"
+      content="Save, organize, and run your SSH connections, Docker commands, and CLI workflows from a beautiful terminal UI. Free, open-source bookmark manager for the command line."
+    />
+    <meta
+      name="keywords"
+      content="SSH bookmark manager, CLI command organizer, terminal bookmark, command line tool, TUI, SSH manager, Docker commands, kubectl bookmarks, shell command manager"
+    />
+    <link rel="canonical" href="https://tuibookie.dev" />
+    <meta
+      property="og:title"
+      content="TuiBookie — SSH &amp; CLI Command Bookmark Manager for the Terminal"
+    />
+    <meta
+      property="og:description"
+      content="Save, organize, and run your SSH connections, Docker commands, and CLI workflows from a beautiful terminal UI."
+    />
+    <meta
+      property="og:image"
+      content="https://tuibookie.dev/assets/tuibookie-logo.png"
+    />
+    <meta property="og:url" content="https://tuibookie.dev" />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/png" href="assets/tuibookie-logo.png" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "TuiBookie",
+        "description": "A fast, beautiful TUI bookmark manager for SSH connections and CLI commands. Organize, navigate, and execute with style.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "macOS, Linux",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "license": "https://opensource.org/licenses/MIT",
+        "url": "https://tuibookie.dev",
+        "downloadUrl": "https://github.com/orvad/tuibookie/releases"
+      }
+    </script>
+    <style>
+      :root {
+        --bg: #2d2a2e;
+        --surface: #383539;
+        --text: #f8f8f2;
+        --accent: #f92672;
+        --green: #a6e22e;
+        --muted: #a59f85;
+        --help: #75715e;
+        --terminal-bg: #1a1a1a;
+        --border: #3e3d40;
+        --yellow: #e6db74;
+        --orange: #c87a1a;
+        --mono: "SF Mono", "Fira Code", "Cascadia Code", monospace;
       }
 
-      .hero h1 {
-        font-size: 32px;
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       }
 
-      .hero .tagline {
-        font-size: 16px;
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.6;
       }
 
-      .install-cmd {
+      .container {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      code,
+      .mono {
+        font-family: var(--mono);
+      }
+
+      .section-label {
         font-size: 12px;
-        flex-wrap: wrap;
-      }
-
-      .screenshot-item {
-        max-width: 100%;
-      }
-
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .install-method {
-        max-width: 100%;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--accent);
+        margin-bottom: 8px;
       }
 
       .section-title {
-        font-size: 22px;
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 40px;
       }
 
-      .screenshots,
-      .features,
-      .why {
-        padding: 30px 0;
+      /* Hero */
+      .hero {
+        padding: 80px 0 60px;
+        text-align: center;
       }
-    }
 
-    @media (min-width: 769px) and (max-width: 1024px) {
+      .hero .install-cmd {
+        display: inline-flex;
+      }
+
+      .hero-logo {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 16px;
+        display: block;
+      }
+
+      .hero h1 {
+        font-size: 42px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        margin-bottom: 8px;
+      }
+
+      .hero h1 span {
+        color: var(--accent);
+      }
+
+      .hero .tagline {
+        font-size: 18px;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+
+      .install-cmd {
+        background: var(--terminal-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px 20px;
+        font-family: var(--mono);
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        max-width: 520px;
+      }
+
+      .install-cmd code {
+        color: var(--green);
+      }
+
+      .copy-btn {
+        background: var(--surface);
+        border: none;
+        color: var(--help);
+        padding: 4px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        font-family: inherit;
+      }
+
+      .copy-btn:hover {
+        color: var(--text);
+      }
+
+      /* Terminal Chrome */
+      .terminal {
+        background: var(--terminal-bg);
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+
+      .terminal-bar {
+        background: var(--surface);
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .terminal-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+
+      .terminal-dot.red {
+        background: var(--accent);
+      }
+      .terminal-dot.yellow {
+        background: var(--yellow);
+      }
+      .terminal-dot.green {
+        background: var(--green);
+      }
+
+      .terminal-title {
+        flex: 1;
+        text-align: center;
+        font-size: 12px;
+        color: var(--help);
+        font-family: var(--mono);
+      }
+
+      .terminal-body {
+        padding: 4px;
+      }
+
+      /* Screenshots */
+      .screenshots {
+        padding: 60px 0;
+      }
+
+      .screenshots > .section-label,
+      .screenshots > .section-title {
+        text-align: center;
+      }
+
+      .screenshot-row {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        align-items: center;
+      }
+
+      .screenshot-item {
+        width: 100%;
+        max-width: 560px;
+      }
+
+      .screenshot-caption {
+        margin-bottom: 16px;
+        font-size: 15px;
+        text-align: left;
+      }
+
+      .screenshot-caption strong {
+        color: #ffffff;
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .screenshot-caption .caption-desc {
+        color: var(--muted);
+      }
+
+      /* TUI Simulation */
+      .tui {
+        background: #1a1a1a;
+        padding: 16px 20px;
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.8;
+        color: var(--muted);
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        white-space: nowrap;
+        overflow-x: auto;
+      }
+
+      .tui-badge {
+        display: block;
+        font-size: 12px;
+        margin-bottom: 4px;
+      }
+      .tui-badge .tui-title-prefix {
+        color: #c0bdb8;
+        font-weight: bold;
+      }
+      .tui-badge .tui-title-name {
+        color: var(--accent);
+        font-weight: bold;
+      }
+      .tui-badge .tui-title-ver {
+        color: var(--help);
+      }
+      .tui-sep {
+        color: var(--help);
+        margin-bottom: 12px;
+        letter-spacing: -1px;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      .tui-heading {
+        color: var(--green);
+        font-weight: bold;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+
+      .tui-selected {
+        color: var(--green);
+      }
+
+      .tui-cmd {
+        color: var(--help);
+        margin-left: 2px;
+      }
+      .tui-param {
+        color: var(--orange);
+      }
+
+      .tui-help {
+        color: var(--help);
+        font-size: 11px;
+        margin-top: auto;
+        padding-top: 12px;
+      }
+
+      .tui-help span {
+        color: var(--yellow);
+      }
+
+      /* Features */
+      .features {
+        padding: 60px 0;
+      }
+
       .features-grid {
-        grid-template-columns: repeat(2, 1fr);
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
       }
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <!-- Hero -->
-    <section class="hero">
-      <div class="hero-text">
-        <img src="assets/tuibookie-logo.png" alt="TuiBookie logo" class="hero-logo">
-        <h1>Tui<span>Bookie</span></h1>
-        <p class="tagline">A fast, beautiful TUI bookmark manager<br>for your CLI commands.</p>
-        <p style="font-size:14px;color:var(--help);margin-bottom:24px;"><!--VERSION-->v1.5.0<!--/VERSION--> · Available for macOS and Linux</p>
-        <div class="install-cmd">
-          <span style="color:var(--help)">$</span>
-          <code>brew install orvad/tuibookie/tuibookie</code>
-          <button class="copy-btn" onclick="copyCmd(this)">Copy</button>
-        </div>
-      </div>
-    </section>
 
-    <!-- Screenshots -->
-    <section class="screenshots">
-      <div class="section-label">See it in action</div>
-      <h2 class="section-title">Organize. Navigate. Execute.</h2>
-      <div class="screenshot-row">
-        <div class="screenshot-item">
-          <div class="screenshot-caption"><strong>Browse categories</strong><span class="caption-desc">See all your command groups at a glance with bookmark counts.</span></div>
-          <div class="terminal">
-            <div class="terminal-bar">
-              <div class="terminal-dot red"></div>
-              <div class="terminal-dot yellow"></div>
-              <div class="terminal-dot green"></div>
+      .feature-card {
+        background: var(--surface);
+        border-radius: 10px;
+        padding: 24px;
+        border: 1px solid var(--border);
+      }
+
+      .feature-icon {
+        font-size: 24px;
+        height: 36px;
+        margin-bottom: 12px;
+        color: var(--green);
+        font-family: var(--mono);
+        font-weight: bold;
+        display: flex;
+        align-items: flex-end;
+      }
+
+      .feature-card h3 {
+        font-size: 16px;
+        margin-bottom: 6px;
+      }
+
+      .feature-card p {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      /* Why */
+      .why {
+        padding: 60px 0;
+      }
+
+      .why > .section-label,
+      .why > .section-title {
+        text-align: center;
+      }
+
+      .why-text {
+        max-width: 560px;
+        margin: 0 auto;
+        font-size: 16px;
+        line-height: 1.8;
+        color: var(--muted);
+      }
+
+      .why-text p {
+        margin-bottom: 16px;
+      }
+
+      .why-text strong {
+        color: var(--text);
+      }
+
+      /* Install */
+      .install-section {
+        padding: 60px 0;
+        text-align: center;
+      }
+
+      .install-methods {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        align-items: center;
+        margin-top: 32px;
+      }
+
+      .install-method {
+        background: var(--terminal-bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 20px 24px;
+        width: 100%;
+        max-width: 560px;
+        text-align: left;
+      }
+
+      .install-method .method-label {
+        font-size: 12px;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+      }
+
+      .install-method code {
+        font-size: 13px;
+        color: var(--green);
+        word-break: break-all;
+        white-space: pre-line;
+      }
+
+      .install-method .copy-btn {
+        margin-top: 12px;
+        display: block;
+      }
+
+      /* GitHub CTA */
+      .github-cta {
+        padding: 40px 0;
+        text-align: center;
+      }
+
+      .github-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 15px;
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .github-btn:hover {
+        border-color: var(--green);
+      }
+
+      /* Footer */
+      footer {
+        padding: 32px 0;
+        text-align: center;
+        color: var(--help);
+        font-size: 13px;
+        border-top: 1px solid var(--border);
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .hero {
+          padding: 48px 0 40px;
+        }
+
+        .hero h1 {
+          font-size: 32px;
+        }
+
+        .hero .tagline {
+          font-size: 16px;
+        }
+
+        .install-cmd {
+          font-size: 12px;
+          flex-wrap: wrap;
+        }
+
+        .screenshot-item {
+          max-width: 100%;
+        }
+
+        .features-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .install-method {
+          max-width: 100%;
+        }
+
+        .section-title {
+          font-size: 22px;
+        }
+
+        .screenshots,
+        .features,
+        .why {
+          padding: 30px 0;
+        }
+      }
+
+      @media (min-width: 769px) and (max-width: 1024px) {
+        .features-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Hero -->
+      <section class="hero">
+        <div class="hero-text">
+          <img
+            src="assets/tuibookie-logo.png"
+            alt="TuiBookie logo"
+            class="hero-logo"
+          />
+          <h1>Tui<span>Bookie</span></h1>
+          <p class="tagline">
+            A fast, beautiful TUI bookmark manager<br />for your CLI commands.
+          </p>
+          <p style="font-size: 14px; color: var(--help); margin-bottom: 24px">
+            <!--VERSION-->v1.5.0<!--/VERSION-->
+            · Available for macOS and Linux
+          </p>
+          <div class="install-cmd">
+            <span style="color: var(--help)">$</span>
+            <code>brew install orvad/tuibookie/tuibookie</code>
+            <button class="copy-btn" onclick="copyCmd(this)">Copy</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Screenshots -->
+      <section class="screenshots">
+        <div class="section-label">See it in action</div>
+        <h2 class="section-title">Organize. Navigate. Execute.</h2>
+        <div class="screenshot-row">
+          <div class="screenshot-item">
+            <div class="screenshot-caption">
+              <strong>Browse categories</strong
+              ><span class="caption-desc"
+                >See all your command groups at a glance with bookmark
+                counts.</span
+              >
             </div>
-            <div class="terminal-body">
-              <div class="tui">
-                <div class="tui-badge"><span class="tui-title-prefix">Tui</span><span class="tui-title-name">Bookie</span> <span class="tui-title-ver"><!--VERSION-->v1.5.0<!--/VERSION--></span></div>
-                <div class="tui-sep">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
-                <div class="tui-selected">&gt; Deployments (3)</div>
-                <div>&nbsp; Docker (4)</div>
-                <div>&nbsp; Kubernetes (3)</div>
-                <div>&nbsp; FFmpeg (9)</div>
-                <div>&nbsp; Production servers (3)</div>
-                <div>&nbsp; Staging servers (2)</div>
-                <div class="tui-help"><span>[a]</span>dd <span>[e]</span>dit <span>[d]</span>elete <span>[s]</span>ettings <span>[enter/&rarr;]</span> open <span>[q/esc]</span> quit</div>
+            <div class="terminal">
+              <div class="terminal-bar">
+                <div class="terminal-dot red"></div>
+                <div class="terminal-dot yellow"></div>
+                <div class="terminal-dot green"></div>
+              </div>
+              <div class="terminal-body">
+                <div class="tui">
+                  <div class="tui-badge">
+                    <span class="tui-title-prefix">Tui</span
+                    ><span class="tui-title-name">Bookie</span>
+                    <span class="tui-title-ver"
+                      ><!--VERSION-->v1.5.0<!--/VERSION--></span
+                    >
+                  </div>
+                  <div class="tui-sep">
+                    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                  </div>
+                  <div class="tui-selected">&gt; Deployments (3)</div>
+                  <div>&nbsp; Docker (4)</div>
+                  <div>&nbsp; Kubernetes (3)</div>
+                  <div>&nbsp; FFmpeg (9)</div>
+                  <div>&nbsp; Production servers (3)</div>
+                  <div>&nbsp; Staging servers (2)</div>
+                  <div class="tui-help">
+                    <span>[a]</span>dd <span>[e]</span>dit <span>[d]</span>elete
+                    <span>[s]</span>ettings <span>[enter/&rarr;]</span> open
+                    <span>[q/esc]</span> quit
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="screenshot-item">
+            <div class="screenshot-caption">
+              <strong>Browse bookmarks</strong
+              ><span class="caption-desc"
+                >Drill into a category to see commands. Select one and press
+                Enter to run it.</span
+              >
+            </div>
+            <div class="terminal">
+              <div class="terminal-bar">
+                <div class="terminal-dot red"></div>
+                <div class="terminal-dot yellow"></div>
+                <div class="terminal-dot green"></div>
+              </div>
+              <div class="terminal-body">
+                <div class="tui">
+                  <div class="tui-badge">
+                    <span class="tui-title-prefix">Tui</span
+                    ><span class="tui-title-name">Bookie</span>
+                    <span class="tui-title-ver"
+                      ><!--VERSION-->v1.5.0<!--/VERSION--></span
+                    >
+                  </div>
+                  <div class="tui-sep">
+                    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                  </div>
+                  <div class="tui-heading">Kubernetes</div>
+                  <div class="tui-selected">
+                    &gt; API logs
+                    <span class="tui-cmd"
+                      >kubectl logs -f deployment/api -n production</span
+                    >
+                  </div>
+                  <div>
+                    &nbsp; Node resources
+                    <span class="tui-cmd">kubectl top nodes</span>
+                  </div>
+                  <div>
+                    &nbsp; Prod pods
+                    <span class="tui-cmd">kubectl get pods -n production</span>
+                  </div>
+                  <div class="tui-help">
+                    <span>[a]</span>dd <span>[e]</span>dit <span>[d]</span>elete
+                    <span>[enter]</span> run <span>[&larr;/esc]</span> back
+                    <span>[q]</span>uit
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="screenshot-item">
+            <div class="screenshot-caption">
+              <strong>Parameterized commands</strong
+              ><span class="caption-desc"
+                >Add <span style="color: var(--orange)">{{variables}}</span> to
+                any command. TuiBookie prompts you for each value before
+                running.</span
+              >
+            </div>
+            <div class="terminal">
+              <div class="terminal-bar">
+                <div class="terminal-dot red"></div>
+                <div class="terminal-dot yellow"></div>
+                <div class="terminal-dot green"></div>
+              </div>
+              <div class="terminal-body">
+                <div class="tui">
+                  <div class="tui-badge">
+                    <span class="tui-title-prefix">Tui</span
+                    ><span class="tui-title-name">Bookie</span>
+                    <span class="tui-title-ver"
+                      ><!--VERSION-->v1.5.0<!--/VERSION--></span
+                    >
+                  </div>
+                  <div class="tui-sep">
+                    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                  </div>
+                  <div class="tui-heading">Staging servers</div>
+                  <div class="tui-selected">
+                    &gt; app
+                    <span class="tui-cmd"
+                      >ssh <span class="tui-param">admin</span>@<span
+                        class="tui-param"
+                        >server</span
+                      ></span
+                    >
+                  </div>
+                  <div>
+                    &nbsp; copy stuff
+                    <span class="tui-cmd"
+                      >cp -r <span class="tui-param">somefolder</span>
+                      <span class="tui-param">someotherfolder</span></span
+                    >
+                  </div>
+                  <div>
+                    &nbsp; database
+                    <span class="tui-cmd">ssh dev@staging-db.example.com</span>
+                  </div>
+                  <div class="tui-help">
+                    <span>[a]</span>dd <span>[e]</span>dit <span>[d]</span>elete
+                    <span>[enter]</span> run <span>[&larr;/esc]</span> back
+                    <span>[q]</span>uit
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="screenshot-item">
+            <div class="screenshot-caption">
+              <strong>Settings</strong
+              ><span class="caption-desc"
+                >Configure storage, sync to Gist, or connect a shared git repo
+                for team bookmarks.</span
+              >
+            </div>
+            <div class="terminal">
+              <div class="terminal-bar">
+                <div class="terminal-dot red"></div>
+                <div class="terminal-dot yellow"></div>
+                <div class="terminal-dot green"></div>
+              </div>
+              <div class="terminal-body">
+                <div class="tui">
+                  <div class="tui-badge">
+                    <span class="tui-title-prefix">Tui</span
+                    ><span class="tui-title-name">Bookie</span>
+                    <span class="tui-title-ver"
+                      ><!--VERSION-->v1.5.0<!--/VERSION--></span
+                    >
+                  </div>
+                  <div class="tui-sep">
+                    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                  </div>
+                  <div class="tui-heading">Settings</div>
+                  <div style="color: var(--help)">CONFIG</div>
+                  <div>
+                    &nbsp; Bookmarks file: ~/.config/tuibookie/bookmarks.json
+                  </div>
+                  <div>&nbsp;</div>
+                  <div style="color: var(--help)">DATA</div>
+                  <div>&nbsp; Export bookmarks</div>
+                  <div>&nbsp; Import bookmarks</div>
+                  <div>&nbsp;</div>
+                  <div style="color: var(--help)">SYNC</div>
+                  <div>&nbsp; Push to Gist</div>
+                  <div>&nbsp; Pull from Gist</div>
+                  <div>&nbsp; GitHub token: ****hEss</div>
+                  <div>&nbsp;</div>
+                  <div style="color: var(--help)">SHARED</div>
+                  <div class="tui-selected">
+                    &gt; Shared repo: git@github.com:team/devops.git
+                  </div>
+                  <div>&nbsp; Shared file path: bookmarks.json</div>
+                  <div>&nbsp; Sync shared bookmarks</div>
+                  <div>&nbsp; Disconnect shared repo</div>
+                  <div class="tui-help">
+                    <span>[enter/&rarr;]</span> select
+                    <span>[&larr;/esc]</span> back <span>[q]</span> quit
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="screenshot-item">
-          <div class="screenshot-caption"><strong>Browse bookmarks</strong><span class="caption-desc">Drill into a category to see commands. Select one and press Enter to run it.</span></div>
-          <div class="terminal">
-            <div class="terminal-bar">
-              <div class="terminal-dot red"></div>
-              <div class="terminal-dot yellow"></div>
-              <div class="terminal-dot green"></div>
+      </section>
+
+      <!-- Why TuiBookie -->
+      <section class="why">
+        <div class="section-label">The story</div>
+        <h2 class="section-title">Why TuiBookie?</h2>
+        <div class="why-text">
+          <p>
+            Tired of scrolling through shell history to find that one SSH
+            command? TuiBookie was born from a simple frustration:
+            <strong
+              >too many servers, too many commands, no good way to organize them
+              in the terminal.</strong
+            >
+          </p>
+          <p>
+            Built originally as an <strong>SSH bookmark manager</strong>,
+            TuiBookie grew into a general-purpose CLI command organizer. Save
+            any command &mdash; SSH connections, Docker workflows, kubectl
+            operations, deployment scripts &mdash; and run them instantly from a
+            clean, keyboard-driven interface.
+          </p>
+          <p>
+            Ever wanted to share complex CLI commands with your team? With TuiBookie you can &mdash; sync shared bookmarks through any git repo and keep everyone on the same page.
+          </p>
+          <p>
+            <strong>No browser. No GUI. Just your terminal, organized.</strong>
+          </p>
+        </div>
+      </section>
+
+      <!-- Features -->
+      <section class="features">
+        <div style="text-align: center">
+          <div class="section-label">Features</div>
+          <h2 class="section-title">Everything you need, nothing you don't.</h2>
+        </div>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon" style="font-size: 28px">&#9889;</div>
+            <h3>Lightning Fast</h3>
+            <p>
+              Single binary, instant startup. No dependencies, no interpreters,
+              no bloat.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="font-size: 32px">&#8644;</div>
+            <h3>Import / Export</h3>
+            <p>
+              Back up your bookmarks as JSON. Import from file picker or manual
+              path.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="font-size: 28px">&#9670;</div>
+            <h3>Shared Bookmarks</h3>
+            <p>
+              Sync team bookmarks from any git repo. Read-only detection and
+              background sync.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="font-size: 32px">&#8645;</div>
+            <h3>Gist Sync</h3>
+            <p>
+              Push your local bookmarks to a secret GitHub Gist. Pull them on
+              any machine. Versioned backup, zero friction.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">[:]</div>
+            <h3>Categories</h3>
+            <p>
+              Group commands by project, environment, or workflow. Add, rename,
+              delete on the fly.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="font-size: 22px">
+              <span style="color: var(--green)">{{</span
+              ><span style="color: var(--orange)">&thinsp;</span
+              ><span style="color: var(--green)">}}</span>
             </div>
-            <div class="terminal-body">
-              <div class="tui">
-                <div class="tui-badge"><span class="tui-title-prefix">Tui</span><span class="tui-title-name">Bookie</span> <span class="tui-title-ver"><!--VERSION-->v1.5.0<!--/VERSION--></span></div>
-                <div class="tui-sep">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
-                <div class="tui-heading">Kubernetes</div>
-                <div class="tui-selected">&gt; API logs <span class="tui-cmd">kubectl logs -f deployment/api -n production</span></div>
-                <div>&nbsp; Node resources <span class="tui-cmd">kubectl top nodes</span></div>
-                <div>&nbsp; Prod pods <span class="tui-cmd">kubectl get pods -n production</span></div>
-                <div class="tui-help"><span>[a]</span>dd <span>[e]</span>dit <span>[d]</span>elete <span>[enter]</span> run <span>[&larr;/esc]</span> back <span>[q]</span>uit</div>
-              </div>
+            <h3>Parameterized</h3>
+            <p>
+              Add <span style="color: var(--orange)">{{variables}}</span> to any
+              command. Fill in values at run time with a live-updating preview.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div
+              class="feature-icon"
+              style="font-size: 22px; letter-spacing: 6px"
+            >
+              <span style="color: #f92672">●</span
+              ><span style="color: #a6e22e">●</span
+              ><span style="color: #e6db74">●</span
+              ><span style="color: #66d9ef">●</span
+              ><span style="color: #ae81ff">●</span
+              ><span style="color: #fd971f">●</span>
             </div>
+            <h3>Monokai Theme</h3>
+            <p>
+              A hand-tuned Monokai color palette with light and dark modes.
+              Auto-detects your terminal background.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">hjkl</div>
+            <h3>Vim Navigation</h3>
+            <p>
+              Arrow keys and vim-style h/j/k/l navigation. Drill in with &rarr;,
+              back with &larr;.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">~/.cfg</div>
+            <h3>Configurable</h3>
+            <p>
+              Change your bookmarks file path right from Settings. Or use
+              --config flag and env var for scripting.
+            </p>
           </div>
         </div>
-        <div class="screenshot-item">
-          <div class="screenshot-caption"><strong>Parameterized commands</strong><span class="caption-desc">Add <span style="color:var(--orange)">{{variables}}</span> to any command. TuiBookie prompts you for each value before running.</span></div>
-          <div class="terminal">
-            <div class="terminal-bar">
-              <div class="terminal-dot red"></div>
-              <div class="terminal-dot yellow"></div>
-              <div class="terminal-dot green"></div>
-            </div>
-            <div class="terminal-body">
-              <div class="tui">
-                <div class="tui-badge"><span class="tui-title-prefix">Tui</span><span class="tui-title-name">Bookie</span> <span class="tui-title-ver"><!--VERSION-->v1.5.0<!--/VERSION--></span></div>
-                <div class="tui-sep">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
-                <div class="tui-heading">Staging servers</div>
-                <div class="tui-selected">&gt; app <span class="tui-cmd">ssh <span class="tui-param">admin</span>@<span class="tui-param">server</span></span></div>
-                <div>&nbsp; copy stuff <span class="tui-cmd">cp -r <span class="tui-param">somefolder</span> <span class="tui-param">someotherfolder</span></span></div>
-                <div>&nbsp; database <span class="tui-cmd">ssh dev@staging-db.example.com</span></div>
-                <div class="tui-help"><span>[a]</span>dd <span>[e]</span>dit <span>[d]</span>elete <span>[enter]</span> run <span>[&larr;/esc]</span> back <span>[q]</span>uit</div>
-              </div>
-            </div>
+      </section>
+
+      <!-- Install -->
+      <section class="install-section">
+        <div class="section-label">Get started</div>
+        <h2 class="section-title">Install in seconds.</h2>
+        <div class="install-methods">
+          <div class="install-method">
+            <div class="method-label">Homebrew</div>
+            <code
+              >brew tap orvad/tuibookie &amp;&amp; brew install tuibookie</code
+            >
+            <button class="copy-btn" onclick="copyCmd(this)">Copy</button>
+          </div>
+          <div class="install-method">
+            <div class="method-label">Quick Install</div>
+            <code
+              >curl -sL
+              https://raw.githubusercontent.com/orvad/tuibookie/main/install.sh
+              | sh</code
+            >
+            <button class="copy-btn" onclick="copyCmd(this)">Copy</button>
+          </div>
+          <div class="install-method">
+            <div class="method-label">From Source</div>
+            <code>go install github.com/orvad/tuibookie@latest</code>
+            <button class="copy-btn" onclick="copyCmd(this)">Copy</button>
           </div>
         </div>
-        <div class="screenshot-item">
-          <div class="screenshot-caption"><strong>Settings</strong><span class="caption-desc">Configure your bookmarks file path, export backups, or import from a JSON file.</span></div>
-          <div class="terminal">
-            <div class="terminal-bar">
-              <div class="terminal-dot red"></div>
-              <div class="terminal-dot yellow"></div>
-              <div class="terminal-dot green"></div>
-            </div>
-            <div class="terminal-body">
-              <div class="tui">
-                <div class="tui-badge"><span class="tui-title-prefix">Tui</span><span class="tui-title-name">Bookie</span> <span class="tui-title-ver"><!--VERSION-->v1.5.0<!--/VERSION--></span></div>
-                <div class="tui-sep">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
-                <div class="tui-heading">Settings</div>
-                <div style="color:var(--help)">CONFIG</div>
-                <div>&nbsp; Bookmarks file: ~/.config/tuibookie/bookmarks.json</div>
-                <div>&nbsp;</div>
-                <div style="color:var(--help)">DATA</div>
-                <div>&nbsp; Export bookmarks</div>
-                <div>&nbsp; Import bookmarks</div>
-                <div>&nbsp;</div>
-                <div style="color:var(--help)">SYNC</div>
-                <div class="tui-selected">&gt; Push to Gist</div>
-                <div>&nbsp; Pull from Gist</div>
-                <div>&nbsp; GitHub token: ****hEss</div>
-                <div class="tui-help"><span>[enter/&rarr;]</span> select <span>[&larr;/esc]</span> back <span>[q]</span> quit</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- Why TuiBookie -->
-    <section class="why">
-      <div class="section-label">The story</div>
-      <h2 class="section-title">Why TuiBookie?</h2>
-      <div class="why-text">
-        <p>Tired of scrolling through shell history to find that one SSH command? TuiBookie was born from a simple frustration: <strong>too many servers, too many commands, no good way to organize them in the terminal.</strong></p>
-        <p>Built originally as an <strong>SSH bookmark manager</strong>, TuiBookie grew into a general-purpose CLI command organizer. Save any command &mdash; SSH connections, Docker workflows, kubectl operations, deployment scripts &mdash; and run them instantly from a clean, keyboard-driven interface.</p>
-        <p><strong>No browser. No GUI. Just your terminal, organized.</strong></p>
-      </div>
-    </section>
+      <!-- GitHub CTA -->
+      <section class="github-cta">
+        <a
+          href="https://github.com/orvad/tuibookie"
+          class="github-btn"
+          target="_blank"
+          rel="noopener"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"
+            />
+          </svg>
+          Star on GitHub
+        </a>
+      </section>
 
-    <!-- Features -->
-    <section class="features">
-      <div style="text-align:center">
-        <div class="section-label">Features</div>
-        <h2 class="section-title">Everything you need, nothing you don't.</h2>
-      </div>
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">[:]</div>
-          <h3>Categories</h3>
-          <p>Group commands by project, environment, or workflow. Add, rename, delete on the fly.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon" style="font-size:32px">&#8644;</div>
-          <h3>Import / Export</h3>
-          <p>Back up your bookmarks as JSON. Import from file picker or manual path.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">hjkl</div>
-          <h3>Vim Navigation</h3>
-          <p>Arrow keys and vim-style h/j/k/l navigation. Drill in with &rarr;, back with &larr;.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon" style="font-size:32px">&#8645;</div>
-          <h3>Gist Sync</h3>
-          <p>Push your bookmarks to a secret GitHub Gist. Pull them on any machine. Versioned backup, zero friction.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">~/.cfg</div>
-          <h3>Configurable</h3>
-          <p>Change your bookmarks file path right from Settings. Or use --config flag and env var for scripting.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon" style="font-size:22px"><span style="color:var(--green)">{{</span><span style="color:var(--orange)">&thinsp;</span><span style="color:var(--green)">}}</span></div>
-          <h3>Parameterized</h3>
-          <p>Add <span style="color:var(--orange)">{{variables}}</span> to any command. Fill in values at run time with a live-updating preview.</p>
-        </div>
-      </div>
-    </section>
+      <!-- Footer -->
+      <footer>
+        Made with <span style="color: var(--accent)">&hearts;</span> in Denmark
+        &middot; MIT Licensed
+      </footer>
+    </div>
 
-    <!-- Install -->
-    <section class="install-section">
-      <div class="section-label">Get started</div>
-      <h2 class="section-title">Install in seconds.</h2>
-      <div class="install-methods">
-        <div class="install-method">
-          <div class="method-label">Homebrew</div>
-          <code>brew tap orvad/tuibookie &amp;&amp; brew install tuibookie</code>
-          <button class="copy-btn" onclick="copyCmd(this)">Copy</button>
-        </div>
-        <div class="install-method">
-          <div class="method-label">Quick Install</div>
-          <code>curl -sL https://raw.githubusercontent.com/orvad/tuibookie/main/install.sh | sh</code>
-          <button class="copy-btn" onclick="copyCmd(this)">Copy</button>
-        </div>
-        <div class="install-method">
-          <div class="method-label">From Source</div>
-          <code>go install github.com/orvad/tuibookie@latest</code>
-          <button class="copy-btn" onclick="copyCmd(this)">Copy</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- GitHub CTA -->
-    <section class="github-cta">
-      <a href="https://github.com/orvad/tuibookie" class="github-btn" target="_blank" rel="noopener">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-        Star on GitHub
-      </a>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-      Made with <span style="color:var(--accent)">&hearts;</span> in Denmark &middot; MIT Licensed
-    </footer>
-  </div>
-
-  <script>
-  function copyCmd(btn) {
-    var code = btn.parentElement.querySelector('code');
-    navigator.clipboard.writeText(code.textContent).then(function() {
-      btn.textContent = 'Copied!';
-      setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
-    }).catch(function() {
-      btn.textContent = 'Failed';
-      setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
-    });
-  }
-  </script>
-</body>
+    <script>
+      function copyCmd(btn) {
+        var code = btn.parentElement.querySelector("code");
+        navigator.clipboard
+          .writeText(code.textContent)
+          .then(function () {
+            btn.textContent = "Copied!";
+            setTimeout(function () {
+              btn.textContent = "Copy";
+            }, 2000);
+          })
+          .catch(function () {
+            btn.textContent = "Failed";
+            setTimeout(function () {
+              btn.textContent = "Copy";
+            }, 2000);
+          });
+      }
+    </script>
+  </body>
 </html>

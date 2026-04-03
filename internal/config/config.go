@@ -27,10 +27,13 @@ func EnsureConfigDir(path string) error {
 }
 
 type AppConfig struct {
-	BookmarksPath string `json:"bookmarks_path,omitempty"`
-	GistToken     string `json:"gist_token,omitempty"`
-	GistID        string `json:"gist_id,omitempty"`
-	Theme         string `json:"theme,omitempty"` // "auto", "dark", "light"
+	BookmarksPath  string `json:"bookmarks_path,omitempty"`
+	GistToken      string `json:"gist_token,omitempty"`
+	GistID         string `json:"gist_id,omitempty"`
+	Theme          string `json:"theme,omitempty"` // "auto", "dark", "light"
+	SharedRepo     string `json:"shared_repo,omitempty"`
+	SharedFilePath string `json:"shared_file_path,omitempty"`
+	SharedReadOnly bool   `json:"shared_read_only,omitempty"`
 }
 
 func ConfigDir() string {

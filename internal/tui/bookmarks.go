@@ -10,8 +10,17 @@ import (
 	"github.com/orvad/tuibookie/internal/bookmark"
 )
 
+// currentBookmarkItems returns the bookmark list for the currently selected category,
+// routing to either local or shared bookmarks based on context.
+func (m Model) currentBookmarkItems() []bookmark.Bookmark {
+	if m.isSharedContext {
+		return m.sharedBookmarks[m.selectedCat]
+	}
+	return m.bookmarks[m.selectedCat]
+}
+
 func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
-	items := m.bookmarks[m.selectedCat]
+	items := m.currentBookmarkItems()
 
 	switch msg := msg.(type) {
 	case tea.KeyPressMsg:
@@ -71,6 +80,10 @@ func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		case "a":
+			if m.isSharedContext && m.sharedReadOnly {
+				m.statusMsg = "Shared bookmarks are read-only"
+				return m, nil
+			}
 			addConfirm := false
 			m.formAction = formAddBookmark
 			m.form = huh.NewForm(
@@ -91,6 +104,10 @@ func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, m.form.Init()
 		case "e":
 			if len(items) > 0 {
+				if m.isSharedContext && m.sharedReadOnly {
+					m.statusMsg = "Shared bookmarks are read-only"
+					return m, nil
+				}
 				bm := items[m.bmCursor]
 				editName := bm.Name
 				editCmd := bm.Cmd
@@ -118,6 +135,19 @@ func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case "d":
 			if len(items) > 0 {
+				if m.isSharedContext && m.sharedReadOnly {
+					m.statusMsg = "Shared bookmarks are read-only"
+					return m, nil
+				}
+				if m.isSharedContext {
+					bookmark.DeleteBookmark(m.sharedBookmarks, m.selectedCat, m.bmCursor)
+					m.saveShared()
+					cmd := m.pushSharedCmd("delete bookmark from " + m.selectedCat)
+					if m.bmCursor >= len(m.sharedBookmarks[m.selectedCat]) && m.bmCursor > 0 {
+						m.bmCursor--
+					}
+					return m, cmd
+				}
 				bookmark.DeleteBookmark(m.bookmarks, m.selectedCat, m.bmCursor)
 				m.save()
 				if m.bmCursor >= len(m.bookmarks[m.selectedCat]) && m.bmCursor > 0 {
@@ -169,13 +199,26 @@ func (m Model) viewBookmark() string {
 
 	b.WriteString(m.title())
 	b.WriteString("\n\n")
-	b.WriteString(headingStyle.Render("  " + strings.ToUpper(m.selectedCat)))
+
+	if m.hasBothSections() {
+		prefix := "LOCAL"
+		if m.isSharedContext {
+			prefix = "SHARED"
+		}
+		b.WriteString(headingStyle.Render("  "+prefix) + dimStyle.Render(" › ") + headingStyle.Render(strings.ToUpper(m.selectedCat)))
+	} else {
+		b.WriteString(headingStyle.Render("  " + strings.ToUpper(m.selectedCat)))
+	}
 	b.WriteString("\n\n")
 
-	items := m.bookmarks[m.selectedCat]
+	items := m.currentBookmarkItems()
 
 	if len(items) == 0 {
-		b.WriteString(dimStyle.Render("No bookmarks yet. Press 'a' to add one."))
+		if m.isSharedContext && m.sharedReadOnly {
+			b.WriteString(dimStyle.Render("No bookmarks in this shared category."))
+		} else {
+			b.WriteString(dimStyle.Render("No bookmarks yet. Press 'a' to add one."))
+		}
 		b.WriteString("\n")
 	} else {
 		for i, bm := range items {

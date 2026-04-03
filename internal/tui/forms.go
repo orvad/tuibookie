@@ -10,6 +10,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 
 	"github.com/orvad/tuibookie/internal/bookmark"
+	"github.com/orvad/tuibookie/internal/config"
 )
 
 func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -26,7 +27,7 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.paramValues = nil
 				m.currentView = bookmarkView
 			case formImport, formImportManual, formChangeBookmarksPath,
-				formSetGistToken:
+				formSetGistToken, formSetSharedRepo, formSetSharedFilePath:
 				m.pendingConfigPath = ""
 				m.pendingGistToken = ""
 				m.currentView = settingsView
@@ -53,6 +54,16 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch m.formAction {
 		case formAddCategory:
 			if name != "" {
+				if m.isSharedContext {
+					bookmark.AddCategory(m.sharedBookmarks, name)
+					m.refreshSharedCategories()
+					m.saveShared()
+					m.selectedCat = name
+					m.bmCursor = 0
+					m.currentView = bookmarkView
+					m.form = nil
+					return m, m.pushSharedCmd("add category: " + name)
+				}
 				bookmark.AddCategory(m.bookmarks, name)
 				m.refreshCategories()
 				m.save()
@@ -65,6 +76,19 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case formEditCategory:
 			if name != "" {
+				if m.isSharedContext {
+					_, shared := m.categoryAtCursor()
+					if shared {
+						sharedIdx := m.catCursor - len(m.categories)
+						oldName := m.sharedCategories[sharedIdx]
+						bookmark.RenameCategory(m.sharedBookmarks, oldName, name)
+						m.refreshSharedCategories()
+						m.saveShared()
+						m.currentView = categoryView
+						m.form = nil
+						return m, m.pushSharedCmd("rename category: " + oldName + " -> " + name)
+					}
+				}
 				oldName := m.categories[m.catCursor]
 				bookmark.RenameCategory(m.bookmarks, oldName, name)
 				m.refreshCategories()
@@ -74,22 +98,38 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case formAddBookmark:
 			if name != "" && cmd != "" {
-				bookmark.AddBookmark(m.bookmarks, m.selectedCat, bookmark.Bookmark{
+				newBm := bookmark.Bookmark{
 					Name:    name,
 					Cmd:     cmd,
 					Confirm: m.form.GetBool("confirm"),
-				})
+				}
+				if m.isSharedContext {
+					bookmark.AddBookmark(m.sharedBookmarks, m.selectedCat, newBm)
+					m.saveShared()
+					m.currentView = bookmarkView
+					m.form = nil
+					return m, m.pushSharedCmd("add bookmark: " + name)
+				}
+				bookmark.AddBookmark(m.bookmarks, m.selectedCat, newBm)
 				m.save()
 			}
 			m.currentView = bookmarkView
 
 		case formEditBookmark:
 			if name != "" && cmd != "" {
-				bookmark.UpdateBookmark(m.bookmarks, m.selectedCat, m.editIndex, bookmark.Bookmark{
+				updatedBm := bookmark.Bookmark{
 					Name:    name,
 					Cmd:     cmd,
 					Confirm: m.form.GetBool("confirm"),
-				})
+				}
+				if m.isSharedContext {
+					bookmark.UpdateBookmark(m.sharedBookmarks, m.selectedCat, m.editIndex, updatedBm)
+					m.saveShared()
+					m.currentView = bookmarkView
+					m.form = nil
+					return m, m.pushSharedCmd("edit bookmark: " + name)
+				}
+				bookmark.UpdateBookmark(m.bookmarks, m.selectedCat, m.editIndex, updatedBm)
 				m.save()
 			}
 			m.currentView = bookmarkView
@@ -176,6 +216,35 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.statusMsg = "Token saved"
 			}
 			m.pendingGistToken = ""
+			m.currentView = settingsView
+
+		case formSetSharedRepo:
+			url := m.form.GetString("url")
+			m.sharedRepoURL = url
+			appCfg, _ := config.LoadAppConfig(m.configDir)
+			appCfg.SharedRepo = url
+			if err := config.SaveAppConfig(m.configDir, appCfg); err != nil {
+				m.statusMsg = "Error saving config: " + err.Error()
+			} else if url != "" {
+				m.statusMsg = "Shared repo saved — use Sync to connect"
+			} else {
+				m.statusMsg = "Shared repo removed"
+			}
+			m.currentView = settingsView
+
+		case formSetSharedFilePath:
+			path := m.form.GetString("path")
+			if path == "" {
+				path = "bookmarks.json"
+			}
+			m.sharedFilePath = path
+			appCfg, _ := config.LoadAppConfig(m.configDir)
+			appCfg.SharedFilePath = path
+			if err := config.SaveAppConfig(m.configDir, appCfg); err != nil {
+				m.statusMsg = "Error saving config: " + err.Error()
+			} else {
+				m.statusMsg = "Shared file path saved"
+			}
 			m.currentView = settingsView
 
 		case formRunParam:
