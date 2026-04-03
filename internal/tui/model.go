@@ -35,6 +35,7 @@ const (
 	formSetGistToken
 	formConfirmPull
 	formRunParam
+	formConfirmExec
 )
 
 type PathSource int
