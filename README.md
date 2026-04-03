@@ -35,6 +35,10 @@ Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea), [Huh](https
 
 <img src="examples/screenshot-03.png" alt="Settings" width="600">
 
+**Parameterized commands** — Define reusable parameters in your commands and fill them in at run time.
+
+<img src="examples/screenshot-parameterized-commands.png" alt="Parameterized commands" width="600">
+
 ## Installation
 
 ### Quick install (recommended)
@@ -102,6 +106,23 @@ In your terminal enter:
 ```bash
 tuibookie
 ```
+
+## Parameterized commands
+
+Commands can include named parameters using `{{name}}` or `{{name:default}}` syntax. When you run a parameterized command, TuiBookie prompts you for each parameter value before executing.
+
+- **`{{name}}`** — prompts for a value with no default
+- **`{{name:default}}`** — prompts for a value, pre-filled with the default
+
+For example, a bookmark with the command:
+
+```
+ssh {{user:admin}}@{{server}}
+```
+
+will prompt for `user` (pre-filled with `admin`) and `server` before running. A live preview of the resolved command updates as you type.
+
+In the bookmark list, parameters are highlighted so you can tell at a glance which commands will prompt for input. Commands without parameters run immediately as before.
 
 ## Settings provides:
 

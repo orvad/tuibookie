@@ -32,6 +32,27 @@ func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter":
 			if len(items) > 0 {
 				cmd := items[m.bmCursor].Cmd
+				params := bookmark.ParseParams(cmd)
+				if len(params) > 0 {
+					m.pendingCmd = cmd
+					m.pendingParams = params
+					m.formAction = formRunParam
+					m.paramValues = make(map[string]*string)
+					groups := make([]huh.Field, len(params))
+					for i, p := range params {
+						val := p.Default
+						m.paramValues[p.Name] = &val
+						groups[i] = huh.NewInput().
+							Title(p.Name).
+							Key(p.Name).
+							Value(&val)
+					}
+					m.form = huh.NewForm(
+						huh.NewGroup(groups...),
+					).WithTheme(formTheme)
+					m.currentView = formView
+					return m, m.form.Init()
+				}
 				parts := strings.Fields(cmd)
 				if len(parts) > 0 {
 					c := exec.Command(parts[0], parts[1:]...)
@@ -89,6 +110,41 @@ func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+func renderLiveCmd(cmd string, values map[string]*string) string {
+	parts := bookmark.ParamRegex.Split(cmd, -1)
+	matches := bookmark.ParamRegex.FindAllStringSubmatch(cmd, -1)
+	var b strings.Builder
+	for i, part := range parts {
+		b.WriteString(dimStyle.Render(part))
+		if i < len(matches) {
+			name := matches[i][1]
+			if ptr, ok := values[name]; ok && *ptr != "" {
+				b.WriteString(paramStyle.Render(*ptr))
+			} else {
+				b.WriteString(paramStyle.Render(name))
+			}
+		}
+	}
+	return b.String()
+}
+
+func renderCmd(cmd string) string {
+	parts := bookmark.ParamRegex.Split(cmd, -1)
+	matches := bookmark.ParamRegex.FindAllStringSubmatch(cmd, -1)
+	var b strings.Builder
+	for i, part := range parts {
+		b.WriteString(dimStyle.Render(part))
+		if i < len(matches) {
+			label := matches[i][1]
+			if matches[i][2] != "" {
+				label = matches[i][2]
+			}
+			b.WriteString(paramStyle.Render(label))
+		}
+	}
+	return b.String()
+}
+
 func (m Model) viewBookmark() string {
 	var b strings.Builder
 
@@ -105,9 +161,9 @@ func (m Model) viewBookmark() string {
 	} else {
 		for i, bm := range items {
 			if i == m.bmCursor {
-				b.WriteString(selectedStyle.Render("> "+bm.Name) + "  " + dimStyle.Render(bm.Cmd))
+				b.WriteString(selectedStyle.Render("> "+bm.Name) + "  " + renderCmd(bm.Cmd))
 			} else {
-				b.WriteString(normalStyle.Render("  "+bm.Name) + "  " + dimStyle.Render(bm.Cmd))
+				b.WriteString(normalStyle.Render("  "+bm.Name) + "  " + renderCmd(bm.Cmd))
 			}
 			b.WriteString("\n")
 		}

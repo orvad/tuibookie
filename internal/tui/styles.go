@@ -44,6 +44,9 @@ var (
 
 	statusMsgStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("#A6E22E"))
+
+	paramStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#C87A1A"))
 )
 
 func monokaiTheme(_ bool) *huh.Styles {

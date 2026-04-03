@@ -3,6 +3,7 @@ package bookmark
 import (
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 )
 
@@ -141,5 +142,114 @@ func TestUpdateBookmark(t *testing.T) {
 	}
 	if bm["cat1"][0].Cmd != "ssh x@y" {
 		t.Fatalf("expected 'ssh x@y', got '%s'", bm["cat1"][0].Cmd)
+	}
+}
+
+func TestParseParams(t *testing.T) {
+	tests := []struct {
+		name string
+		cmd  string
+		want []Param
+	}{
+		{
+			name: "no params",
+			cmd:  "ls -la",
+			want: nil,
+		},
+		{
+			name: "single param without default",
+			cmd:  "ssh {{host}}",
+			want: []Param{{Name: "host", Default: ""}},
+		},
+		{
+			name: "single param with default",
+			cmd:  "ssh {{host:myserver}}",
+			want: []Param{{Name: "host", Default: "myserver"}},
+		},
+		{
+			name: "multiple params",
+			cmd:  "cp -r {{source:somefolder/}} {{dest:someother/}}",
+			want: []Param{
+				{Name: "source", Default: "somefolder/"},
+				{Name: "dest", Default: "someother/"},
+			},
+		},
+		{
+			name: "duplicate params deduplicated",
+			cmd:  "echo {{name}} and {{name}}",
+			want: []Param{{Name: "name", Default: ""}},
+		},
+		{
+			name: "mixed with and without defaults",
+			cmd:  "docker push {{registry:ghcr.io}}/{{image}}:{{tag:latest}}",
+			want: []Param{
+				{Name: "registry", Default: "ghcr.io"},
+				{Name: "image", Default: ""},
+				{Name: "tag", Default: "latest"},
+			},
+		},
+		{
+			name: "malformed placeholder ignored",
+			cmd:  "echo {{}} and {{valid}}",
+			want: []Param{{Name: "valid", Default: ""}},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := ParseParams(tt.cmd)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ParseParams(%q) = %v, want %v", tt.cmd, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestResolveParams(t *testing.T) {
+	tests := []struct {
+		name   string
+		cmd    string
+		values map[string]string
+		want   string
+	}{
+		{
+			name:   "replace all placeholders",
+			cmd:    "cp -r {{source:somefolder/}} {{dest:someother/}}",
+			values: map[string]string{"source": "src/", "dest": "dst/"},
+			want:   "cp -r src/ dst/",
+		},
+		{
+			name:   "duplicate placeholders all replaced",
+			cmd:    "echo {{name}} and {{name}}",
+			values: map[string]string{"name": "hello"},
+			want:   "echo hello and hello",
+		},
+		{
+			name:   "missing key left as-is",
+			cmd:    "ssh {{user}}@{{host}}",
+			values: map[string]string{"user": "root"},
+			want:   "ssh root@{{host}}",
+		},
+		{
+			name:   "empty value replaces placeholder",
+			cmd:    "cmd {{flag}}",
+			values: map[string]string{"flag": ""},
+			want:   "cmd ",
+		},
+		{
+			name:   "no placeholders returns unchanged",
+			cmd:    "ls -la",
+			values: map[string]string{"x": "y"},
+			want:   "ls -la",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := ResolveParams(tt.cmd, tt.values)
+			if got != tt.want {
+				t.Errorf("ResolveParams(%q, %v) = %q, want %q", tt.cmd, tt.values, got, tt.want)
+			}
+		})
 	}
 }
