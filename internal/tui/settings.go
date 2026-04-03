@@ -41,6 +41,7 @@ func (m Model) updateSettings(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyPressMsg:
 		m.statusMsg = ""
+		m.statusIsError = false
 		switch msg.String() {
 		case "ctrl+c", "q":
 			return m, tea.Quit

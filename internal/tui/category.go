@@ -14,6 +14,7 @@ func (m Model) updateCategory(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyPressMsg:
 		m.statusMsg = ""
+		m.statusIsError = false
 		total := m.totalCategoryItems()
 
 		switch msg.String() {
@@ -131,7 +132,7 @@ func (m Model) viewCategory() string {
 		// Show local section
 		if len(m.categories) > 0 {
 			if m.hasBothSections() {
-				b.WriteString(sectionHeaderStyle.Render("  ═══ Local ═══"))
+				b.WriteString(m.renderSectionHeader("Local", false))
 				b.WriteString("\n")
 			}
 			for _, cat := range m.categories {
@@ -150,12 +151,8 @@ func (m Model) viewCategory() string {
 		// Show shared section
 		if m.hasSharedBookmarks() {
 			if m.hasBothSections() {
-				header := "═══ Shared ═══"
-				if m.sharedReadOnly {
-					header = "═══ Shared (read-only) ═══"
-				}
 				b.WriteString("\n")
-				b.WriteString(sectionHeaderStyle.Render("  " + header))
+				b.WriteString(m.renderSectionHeader("Shared", m.sharedReadOnly))
 				b.WriteString("\n")
 			}
 			for _, cat := range m.sharedCategories {
@@ -198,4 +195,11 @@ func (m Model) categoryAtCursor() (string, bool) {
 		return m.sharedCategories[sharedIdx], true
 	}
 	return "", false
+}
+
+func (m Model) renderSectionHeader(label string, readOnly bool) string {
+	if readOnly {
+		label += " (read-only)"
+	}
+	return "  " + helpStyle.Render("◆") + sectionHeaderStyle.Render(" "+strings.ToUpper(label))
 }

@@ -200,11 +200,15 @@ func (m Model) viewBookmark() string {
 	b.WriteString(m.title())
 	b.WriteString("\n\n")
 
-	heading := m.selectedCat
-	if m.isSharedContext {
-		heading = "Shared > " + heading
+	if m.hasBothSections() {
+		prefix := "LOCAL"
+		if m.isSharedContext {
+			prefix = "SHARED"
+		}
+		b.WriteString(headingStyle.Render("  "+prefix) + dimStyle.Render(" › ") + headingStyle.Render(strings.ToUpper(m.selectedCat)))
+	} else {
+		b.WriteString(headingStyle.Render("  " + strings.ToUpper(m.selectedCat)))
 	}
-	b.WriteString(headingStyle.Render("  " + strings.ToUpper(heading)))
 	b.WriteString("\n\n")
 
 	items := m.currentBookmarkItems()

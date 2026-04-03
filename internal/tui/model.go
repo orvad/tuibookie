@@ -83,6 +83,7 @@ type Model struct {
 	settingsCursor    int
 	err               error
 	statusMsg         string
+	statusIsError     bool
 	pendingConfigPath string
 	gistToken         string
 	gistID            string
@@ -207,9 +208,12 @@ func (m Model) syncSharedCmd() tea.Cmd {
 		}
 
 		bmPath := filepath.Join(cloneDir, filePath)
+		if _, statErr := os.Stat(bmPath); os.IsNotExist(statErr) {
+			return sharedSyncMsg{err: fmt.Errorf("bookmarks file not found at '%s' in repo", filePath)}
+		}
 		bm, err := bookmark.Load(bmPath)
 		if err != nil {
-			return sharedSyncMsg{err: fmt.Errorf("shared bookmarks file not found at %s", filePath)}
+			return sharedSyncMsg{err: fmt.Errorf("failed to read shared bookmarks: %w", err)}
 		}
 
 		canPush, _ := gitrepo.CanPush(cloneDir)
@@ -232,6 +236,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.syncing = false
 		if msg.err != nil {
 			m.statusMsg = msg.err.Error()
+			m.statusIsError = true
+			m.sharedBookmarks = nil
+			m.sharedCategories = nil
+			m.catCursor = 0
 			return m, nil
 		}
 		m.sharedBookmarks = msg.bookmarks
@@ -246,6 +254,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case sharedPushMsg:
 		if msg.err != nil {
 			m.statusMsg = "Push failed — will retry on next sync"
+			m.statusIsError = true
 		}
 		return m, nil
 	}
@@ -296,8 +305,14 @@ func (m Model) title() string {
 		return fmt.Sprintf("\n  %s%s\n  %s", name, ver, sep)
 	}
 
-	styledMsg := statusMsgStyle.Render(m.statusMsg)
-	gap := max(1, m.width-4-len(left)-len(m.statusMsg))
+	style := statusMsgStyle
+	displayMsg := m.statusMsg
+	if m.statusIsError {
+		style = statusErrorStyle
+		displayMsg = "! " + m.statusMsg
+	}
+	styledMsg := style.Render(displayMsg)
+	gap := max(1, m.width-4-len(left)-len(displayMsg))
 	return fmt.Sprintf("\n  %s%s%s%s\n  %s", name, ver, strings.Repeat(" ", gap), styledMsg, sep)
 }
 
