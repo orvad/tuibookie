@@ -98,52 +98,12 @@ GOOS=darwin GOARCH=amd64 go build -o tuibookie .
 ```
 
 ## Usage
-
+In your terminal enter:
 ```bash
 tuibookie
 ```
 
-### Navigation
-
-The app uses a stack-based navigation model. Use arrow keys or vim-style keys to move around:
-
-#### Category list (root view)
-
-| Key | Action |
-|---|---|
-| `Up` / `k` | Move cursor up |
-| `Down` / `j` | Move cursor down |
-| `Enter` / `Right` / `l` | Open selected category |
-| `a` | Add a new category |
-| `e` | Rename selected category |
-| `d` | Delete selected category |
-| `s` | Open settings (import/export) |
-| `q` / `Esc` | Quit |
-
-#### Bookmark list (inside a category)
-
-| Key | Action |
-|---|---|
-| `Up` / `k` | Move cursor up |
-| `Down` / `j` | Move cursor down |
-| `Enter` | Run the selected command |
-| `a` | Add a new bookmark |
-| `e` | Edit selected bookmark |
-| `d` | Delete selected bookmark |
-| `Left` / `Esc` / `h` | Go back to categories |
-| `q` | Quit |
-
-#### Settings view
-
-| Key | Action |
-|---|---|
-| `Up` / `k` | Move cursor up |
-| `Down` / `j` | Move cursor down |
-| `Enter` / `Right` / `l` | Execute selected action |
-| `Left` / `Esc` / `h` | Go back to categories |
-| `q` | Quit |
-
-Settings provides:
+## Settings provides:
 
 - **Bookmarks file** — View and change the path to your bookmarks JSON file. When switching, you'll see a confirmation with the number of categories and bookmarks in the target file. If the file doesn't exist, you can create a new empty one.
 - **Export bookmarks** — Saves a backup to the current working directory as `bookmarks-backup-YYYY-MM-DD-HHMMSS.json`
@@ -151,14 +111,6 @@ Settings provides:
 - **Push to Gist** — Uploads your bookmarks to a secret GitHub Gist. On first push, a new gist is created; subsequent pushes update it.
 - **Pull from Gist** — Downloads bookmarks from your gist and replaces the local file. Shows a confirmation with category and bookmark counts before overwriting.
 - **GitHub token** — Set or remove the Personal Access Token used for Gist sync. The token is stored in `config.json` and displayed masked in the UI.
-
-#### Forms (add/edit)
-
-| Key | Action |
-|---|---|
-| `Enter` | Submit the form |
-| `Esc` | Cancel and go back |
-| `Tab` | Next field (multi-field forms) |
 
 ## Configuration
 
@@ -195,46 +147,11 @@ Priority order: `--config` flag > `TUIBOOKIE_CONFIG` env var > `config.json` set
 
 The config directory and files are created automatically on first run.
 
-### Bookmarks file format
+## Contributing
 
-The bookmarks file is plain JSON. Each key is a category name, and the value is an array of bookmarks with `name` and `cmd` fields:
+Contributions are welcome and encouraged! Whether it's a bug fix, new feature, or improvement to the docs — please feel free to open an issue or submit a pull request.
 
-```json
-{
-  "servers": [
-    {
-      "cmd": "ssh deploy@10.0.1.50",
-      "name": "deploy"
-    },
-    {
-      "cmd": "ssh root@10.0.1.50 -p 2222",
-      "name": "root (custom port)"
-    }
-  ],
-  "docker": [
-    {
-      "cmd": "docker compose up -d",
-      "name": "start stack"
-    },
-    {
-      "cmd": "docker compose logs -f",
-      "name": "follow logs"
-    }
-  ],
-  "misc": [
-    {
-      "cmd": "rsync -avz ./dist/ user@server:/var/www/",
-      "name": "deploy frontend"
-    },
-    {
-      "cmd": "kubectl get pods -n production",
-      "name": "check prod pods"
-    }
-  ]
-}
-```
-
-The `cmd` field can be any valid shell command. You can edit this file manually — the app will pick up changes on next launch.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to get started.
 
 ## License
 
