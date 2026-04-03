@@ -1,4 +1,4 @@
-module example/tuibookie
+module github.com/orvad/tuibookie
 
 go 1.26.1
 

@@ -8,9 +8,9 @@ import (
 
 	tea "charm.land/bubbletea/v2"
 
-	"example/tuibookie/internal/bookmark"
-	"example/tuibookie/internal/config"
-	"example/tuibookie/internal/gist"
+	"github.com/orvad/tuibookie/internal/bookmark"
+	"github.com/orvad/tuibookie/internal/config"
+	"github.com/orvad/tuibookie/internal/gist"
 )
 
 var confirmOptions = []string{"Yes", "No"}

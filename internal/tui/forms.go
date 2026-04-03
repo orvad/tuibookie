@@ -9,7 +9,7 @@ import (
 	"charm.land/huh/v2"
 	tea "charm.land/bubbletea/v2"
 
-	"example/tuibookie/internal/bookmark"
+	"github.com/orvad/tuibookie/internal/bookmark"
 )
 
 func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
