@@ -40,6 +40,9 @@ const (
 	formConfirmPull
 	formRunParam
 	formConfirmExec
+	formSetSharedRepo
+	formSetSharedFilePath
+	formConfirmDisconnect
 )
 
 type PathSource int

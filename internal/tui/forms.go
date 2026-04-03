@@ -10,6 +10,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 
 	"github.com/orvad/tuibookie/internal/bookmark"
+	"github.com/orvad/tuibookie/internal/config"
 )
 
 func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -26,7 +27,7 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.paramValues = nil
 				m.currentView = bookmarkView
 			case formImport, formImportManual, formChangeBookmarksPath,
-				formSetGistToken:
+				formSetGistToken, formSetSharedRepo, formSetSharedFilePath:
 				m.pendingConfigPath = ""
 				m.pendingGistToken = ""
 				m.currentView = settingsView
@@ -215,6 +216,35 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.statusMsg = "Token saved"
 			}
 			m.pendingGistToken = ""
+			m.currentView = settingsView
+
+		case formSetSharedRepo:
+			url := m.form.GetString("url")
+			m.sharedRepoURL = url
+			appCfg, _ := config.LoadAppConfig(m.configDir)
+			appCfg.SharedRepo = url
+			if err := config.SaveAppConfig(m.configDir, appCfg); err != nil {
+				m.statusMsg = "Error saving config: " + err.Error()
+			} else if url != "" {
+				m.statusMsg = "Shared repo saved — use Sync to connect"
+			} else {
+				m.statusMsg = "Shared repo removed"
+			}
+			m.currentView = settingsView
+
+		case formSetSharedFilePath:
+			path := m.form.GetString("path")
+			if path == "" {
+				path = "bookmarks.json"
+			}
+			m.sharedFilePath = path
+			appCfg, _ := config.LoadAppConfig(m.configDir)
+			appCfg.SharedFilePath = path
+			if err := config.SaveAppConfig(m.configDir, appCfg); err != nil {
+				m.statusMsg = "Error saving config: " + err.Error()
+			} else {
+				m.statusMsg = "Shared file path saved"
+			}
 			m.currentView = settingsView
 
 		case formRunParam:

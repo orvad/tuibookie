@@ -52,10 +52,11 @@ func (m Model) updateConfirm(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Model) resolveConfirm() (tea.Model, tea.Cmd) {
 	confirmed := m.confirmCursor == 0
 	if !confirmed {
-		if m.confirmAction == formConfirmExec {
+		switch m.confirmAction {
+		case formConfirmExec:
 			m.pendingCmd = ""
 			m.currentView = bookmarkView
-		} else {
+		default:
 			m.pendingConfigPath = ""
 			m.currentView = settingsView
 		}
@@ -145,6 +146,26 @@ func (m Model) onConfirm() (tea.Model, tea.Cmd) {
 			})
 		}
 		m.currentView = bookmarkView
+
+	case formConfirmDisconnect:
+		// Remove shared repo config
+		m.sharedRepoURL = ""
+		m.sharedBookmarks = nil
+		m.sharedCategories = nil
+		m.sharedReadOnly = false
+
+		appCfg, _ := config.LoadAppConfig(m.configDir)
+		appCfg.SharedRepo = ""
+		appCfg.SharedFilePath = ""
+		appCfg.SharedReadOnly = false
+		config.SaveAppConfig(m.configDir, appCfg)
+
+		// Remove cloned directory
+		os.RemoveAll(m.sharedCloneDir)
+
+		m.catCursor = 0
+		m.statusMsg = "Shared repo disconnected"
+		m.currentView = settingsView
 	}
 
 	return m, nil

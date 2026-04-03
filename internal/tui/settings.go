@@ -25,12 +25,16 @@ var settingsItems = []string{
 	"Push to Gist",
 	"Pull from Gist",
 	"GitHub token",
+	"Shared repo",
+	"Shared file path",
+	"Sync shared bookmarks",
+	"Disconnect shared repo",
 }
 
-// Section boundaries: CONFIG [0,dataBreak), DATA [dataBreak,syncBreak), SYNC [syncBreak,len)
 const (
-	dataBreak = 2
-	syncBreak = 4
+	dataBreak   = 2
+	syncBreak   = 4
+	sharedBreak = 7
 )
 
 func (m Model) updateSettings(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -116,6 +120,49 @@ func (m Model) updateSettings(msg tea.Msg) (tea.Model, tea.Cmd) {
 				).WithTheme(formTheme).WithWidth(m.width)
 				m.currentView = formView
 				return m, m.form.Init()
+			case 7: // Shared repo
+				m.formAction = formSetSharedRepo
+				pendingVal := m.sharedRepoURL
+				m.form = huh.NewForm(
+					huh.NewGroup(
+						huh.NewInput().
+							Title("Git clone URL").
+							Key("url").
+							Value(&pendingVal),
+					),
+				).WithTheme(formTheme)
+				m.currentView = formView
+				return m, m.form.Init()
+			case 8: // Shared file path
+				m.formAction = formSetSharedFilePath
+				pendingVal := m.sharedFilePath
+				m.form = huh.NewForm(
+					huh.NewGroup(
+						huh.NewInput().
+							Title("Path to bookmarks file within repo").
+							Key("path").
+							Value(&pendingVal),
+					),
+				).WithTheme(formTheme)
+				m.currentView = formView
+				return m, m.form.Init()
+			case 9: // Sync shared bookmarks
+				if m.sharedRepoURL == "" {
+					m.statusMsg = "Set shared repo first"
+				} else {
+					m.syncing = true
+					m.statusMsg = "Syncing..."
+					return m, m.syncSharedCmd()
+				}
+			case 10: // Disconnect shared repo
+				if m.sharedRepoURL == "" {
+					m.statusMsg = "No shared repo configured"
+				} else {
+					m.confirmMsg = "Disconnect shared repo? This removes shared bookmarks from the app."
+					m.confirmAction = formConfirmDisconnect
+					m.confirmCursor = 0
+					m.currentView = confirmView
+				}
 			}
 		}
 	}
@@ -242,10 +289,34 @@ func (m Model) viewSettings() string {
 	b.WriteString("\n")
 	b.WriteString(dimStyle.Render("  SYNC"))
 	b.WriteString("\n")
-	for i := syncBreak; i < len(settingsItems); i++ {
+	for i := syncBreak; i < sharedBreak; i++ {
 		label := settingsItems[i]
 		if i == 6 {
 			label = "GitHub token: " + maskToken(m.gistToken)
+		}
+		if i == m.settingsCursor {
+			b.WriteString(selectedStyle.Render("> " + label))
+		} else {
+			b.WriteString(normalStyle.Render("  " + label))
+		}
+		b.WriteString("\n")
+	}
+
+	// SHARED section
+	b.WriteString("\n")
+	b.WriteString(dimStyle.Render("  SHARED"))
+	b.WriteString("\n")
+	for i := sharedBreak; i < len(settingsItems); i++ {
+		label := settingsItems[i]
+		if i == 7 {
+			if m.sharedRepoURL == "" {
+				label = "Shared repo: (not set)"
+			} else {
+				label = "Shared repo: " + truncatePath(m.sharedRepoURL, 40)
+			}
+		}
+		if i == 8 {
+			label = "Shared file path: " + m.sharedFilePath
 		}
 		if i == m.settingsCursor {
 			b.WriteString(selectedStyle.Render("> " + label))
