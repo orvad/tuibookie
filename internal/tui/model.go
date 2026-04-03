@@ -61,6 +61,7 @@ type Model struct {
 	form        *huh.Form
 	formAction  formAction
 	editIndex         int
+	editConfirm       bool
 	settingsCursor    int
 	err               error
 	statusMsg         string

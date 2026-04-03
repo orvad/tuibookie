@@ -71,6 +71,7 @@ func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		case "a":
+			m.editConfirm = false
 			m.formAction = formAddBookmark
 			m.form = huh.NewForm(
 				huh.NewGroup(
@@ -80,6 +81,10 @@ func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
 					huh.NewInput().
 						Title("Command").
 						Key("cmd"),
+					huh.NewConfirm().
+						Title("Confirm before execute?").
+						Key("confirm").
+						Value(&m.editConfirm),
 				),
 			).WithTheme(formTheme)
 			m.currentView = formView
@@ -89,6 +94,7 @@ func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
 				bm := items[m.bmCursor]
 				editName := bm.Name
 				editCmd := bm.Cmd
+				m.editConfirm = bm.Confirm
 				m.editIndex = m.bmCursor
 				m.formAction = formEditBookmark
 				m.form = huh.NewForm(
@@ -101,6 +107,10 @@ func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
 							Title("Command").
 							Key("cmd").
 							Value(&editCmd),
+						huh.NewConfirm().
+							Title("Confirm before execute?").
+							Key("confirm").
+							Value(&m.editConfirm),
 					),
 				).WithTheme(formTheme)
 				m.currentView = formView

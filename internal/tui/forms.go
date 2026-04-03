@@ -75,8 +75,9 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case formAddBookmark:
 			if name != "" && cmd != "" {
 				bookmark.AddBookmark(m.bookmarks, m.selectedCat, bookmark.Bookmark{
-					Name: name,
-					Cmd:  cmd,
+					Name:    name,
+					Cmd:     cmd,
+					Confirm: m.editConfirm,
 				})
 				m.save()
 			}
@@ -85,8 +86,9 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case formEditBookmark:
 			if name != "" && cmd != "" {
 				bookmark.UpdateBookmark(m.bookmarks, m.selectedCat, m.editIndex, bookmark.Bookmark{
-					Name: name,
-					Cmd:  cmd,
+					Name:    name,
+					Cmd:     cmd,
+					Confirm: m.editConfirm,
 				})
 				m.save()
 			}
