@@ -22,7 +22,12 @@ func (m Model) updateConfirm(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c", "q":
 			return m, tea.Quit
 		case "esc", "left", "h":
-			m.currentView = settingsView
+			if m.confirmAction == formConfirmExec {
+				m.pendingCmd = ""
+				m.currentView = bookmarkView
+			} else {
+				m.currentView = settingsView
+			}
 		case "up", "k":
 			if m.confirmCursor > 0 {
 				m.confirmCursor--
