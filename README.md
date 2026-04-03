@@ -124,6 +124,10 @@ will prompt for `user` (pre-filled with `admin`) and `server` before running. A 
 
 In the bookmark list, parameters are highlighted so you can tell at a glance which commands will prompt for input. Commands without parameters run immediately as before.
 
+## Confirm before execute
+
+Individual bookmarks can be marked to require confirmation before running. When you add or edit a bookmark, set **"Confirm before execute?"** to Yes. Bookmarks with confirmation enabled show a bold pink **!** indicator in the list, and pressing Enter will display the resolved command in a confirmation dialog — you must confirm with `y` before it runs. This is useful for dangerous commands like `rm -rf`, `kubectl delete`, or anything you don't want to fire accidentally.
+
 ## Settings provides:
 
 - **Bookmarks file** — View and change the path to your bookmarks JSON file. When switching, you'll see a confirmation with the number of categories and bookmarks in the target file. If the file doesn't exist, you can create a new empty one.
