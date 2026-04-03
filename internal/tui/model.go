@@ -7,8 +7,8 @@ import (
 	"charm.land/huh/v2"
 	tea "charm.land/bubbletea/v2"
 
-	"example/tuibookie/internal/bookmark"
-	"example/tuibookie/internal/config"
+	"github.com/orvad/tuibookie/internal/bookmark"
+	"github.com/orvad/tuibookie/internal/config"
 )
 
 type view int
