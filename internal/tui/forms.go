@@ -77,7 +77,7 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 				bookmark.AddBookmark(m.bookmarks, m.selectedCat, bookmark.Bookmark{
 					Name:    name,
 					Cmd:     cmd,
-					Confirm: m.editConfirm,
+					Confirm: m.form.GetBool("confirm"),
 				})
 				m.save()
 			}
@@ -88,7 +88,7 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 				bookmark.UpdateBookmark(m.bookmarks, m.selectedCat, m.editIndex, bookmark.Bookmark{
 					Name:    name,
 					Cmd:     cmd,
-					Confirm: m.editConfirm,
+					Confirm: m.form.GetBool("confirm"),
 				})
 				m.save()
 			}
