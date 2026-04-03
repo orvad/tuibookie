@@ -47,6 +47,10 @@ var (
 
 	paramStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("#C87A1A"))
+
+	confirmIndicatorStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("#F92672")).
+				Bold(true)
 )
 
 func monokaiTheme(_ bool) *huh.Styles {

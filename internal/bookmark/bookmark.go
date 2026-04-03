@@ -11,8 +11,9 @@ import (
 )
 
 type Bookmark struct {
-	Cmd  string `json:"cmd"`
-	Name string `json:"name"`
+	Cmd     string `json:"cmd"`
+	Name    string `json:"name"`
+	Confirm bool   `json:"confirm,omitempty"`
 }
 
 type Bookmarks map[string][]Bookmark

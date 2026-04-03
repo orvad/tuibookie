@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -202,6 +203,74 @@ func TestParseParams(t *testing.T) {
 				t.Errorf("ParseParams(%q) = %v, want %v", tt.cmd, got, tt.want)
 			}
 		})
+	}
+}
+
+func TestLoadBookmarkWithoutConfirmField(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "bookmarks.json")
+
+	data := `{"servers":[{"cmd":"ssh user@host","name":"myserver"}]}`
+	if err := os.WriteFile(path, []byte(data), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	bm, err := Load(path)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if bm["servers"][0].Confirm != false {
+		t.Fatal("expected Confirm to default to false")
+	}
+}
+
+func TestSaveAndLoadWithConfirm(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "bookmarks.json")
+
+	bm := Bookmarks{
+		"danger": {
+			{Cmd: "rm -rf /tmp/test", Name: "cleanup", Confirm: true},
+			{Cmd: "ls -la", Name: "list", Confirm: false},
+		},
+	}
+
+	if err := Save(path, bm); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	loaded, err := Load(path)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if loaded["danger"][0].Confirm != true {
+		t.Fatal("expected cleanup to have Confirm=true")
+	}
+	if loaded["danger"][1].Confirm != false {
+		t.Fatal("expected list to have Confirm=false")
+	}
+}
+
+func TestSaveOmitsConfirmWhenFalse(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "bookmarks.json")
+
+	bm := Bookmarks{
+		"cat": {
+			{Cmd: "echo hi", Name: "safe"},
+		},
+	}
+
+	if err := Save(path, bm); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(data), "confirm") {
+		t.Fatalf("expected no confirm key in JSON when false, got: %s", data)
 	}
 }
 

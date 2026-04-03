@@ -75,8 +75,9 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case formAddBookmark:
 			if name != "" && cmd != "" {
 				bookmark.AddBookmark(m.bookmarks, m.selectedCat, bookmark.Bookmark{
-					Name: name,
-					Cmd:  cmd,
+					Name:    name,
+					Cmd:     cmd,
+					Confirm: m.form.GetBool("confirm"),
 				})
 				m.save()
 			}
@@ -85,8 +86,9 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case formEditBookmark:
 			if name != "" && cmd != "" {
 				bookmark.UpdateBookmark(m.bookmarks, m.selectedCat, m.editIndex, bookmark.Bookmark{
-					Name: name,
-					Cmd:  cmd,
+					Name:    name,
+					Cmd:     cmd,
+					Confirm: m.form.GetBool("confirm"),
 				})
 				m.save()
 			}
@@ -182,9 +184,19 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 				values[p.Name] = m.form.GetString(p.Name)
 			}
 			resolved := bookmark.ResolveParams(m.pendingCmd, values)
-			m.pendingCmd = ""
 			m.pendingParams = nil
 			m.paramValues = nil
+			items := m.bookmarks[m.selectedCat]
+			if len(items) > m.bmCursor && items[m.bmCursor].Confirm {
+				m.pendingCmd = resolved
+				m.confirmMsg = "Execute: " + resolved + "?"
+				m.confirmAction = formConfirmExec
+				m.confirmCursor = 0
+				m.currentView = confirmView
+				m.form = nil
+				return m, nil
+			}
+			m.pendingCmd = ""
 			m.currentView = bookmarkView
 			parts := strings.Fields(resolved)
 			if len(parts) > 0 {
