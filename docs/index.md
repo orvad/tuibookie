@@ -4,6 +4,34 @@ A fast, interactive terminal bookmark manager for CLI commands.
 
 Organize your frequently used commands into categories, browse them with an intuitive Terminal User Interface, and execute with a single keypress.
 
+<div class="terminal">
+  <div class="terminal-bar">
+    <div class="terminal-dot red"></div>
+    <div class="terminal-dot yellow"></div>
+    <div class="terminal-dot green"></div>
+  </div>
+  <div class="terminal-body">
+    <div class="tui">
+      <div class="tui-badge">
+        <span class="tui-title-prefix">Tui</span><span class="tui-title-name">Bookie</span>
+        <span class="tui-title-ver">v1.6.0</span>
+      </div>
+      <div class="tui-sep">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+      <div class="tui-selected">&gt; Deployments (3)</div>
+      <div>&nbsp; Docker (4)</div>
+      <div>&nbsp; Kubernetes (3)</div>
+      <div>&nbsp; FFmpeg (9)</div>
+      <div>&nbsp; Production servers (3)</div>
+      <div>&nbsp; Staging servers (2)</div>
+      <div class="tui-help">
+        <span>[a]</span>dd <span>[e]</span>dit <span>[d]</span>elete
+        <span>[s]</span>ettings <span>[enter/→]</span> open
+        <span>[q/esc]</span> quit
+      </div>
+    </div>
+  </div>
+</div>
+
 ## Why TuiBookie?
 
 Tired of scrolling through shell history to find that one SSH command? TuiBookie was born from a simple frustration: **too many servers, too many commands, no good way to organize them in the terminal.**
