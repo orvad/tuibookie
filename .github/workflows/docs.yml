@@ -25,8 +25,17 @@ jobs:
 
       - run: zensical build --clean
 
-      - uses: cloudflare/wrangler-action@v3
+      - name: Create Pages project if missing
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy site --project-name=tuibookie-docs
+          command: pages project create tuibookie-docs --production-branch main
+        continue-on-error: true
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy site --project-name=tuibookie-docs --commit-dirty=true
