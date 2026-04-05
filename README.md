@@ -218,4 +218,4 @@ MIT
 
 <a href="https://www.buymeacoffee.com/orvad" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" width="180" ></a>
 
-**Why buy me a coffee?** — TuiBookie is free and open-source, built and maintained in my spare time. If it saves you a few keystrokes, a coffee is always appreciated :heart:
+**Why buy me a coffee?** — TuiBookie is free and open-source, built and maintained in my spare time. If it saves you a few keystrokes or sparks joy, a coffee is always deeply appreciated. Thanks :heart:
