@@ -157,6 +157,17 @@
         font-family: var(--mono);
       }
 
+      .top-header-docs {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 13px;
+        transition: color 0.15s;
+      }
+
+      .top-header-docs:hover {
+        color: var(--text);
+      }
+
       .top-header-github {
         color: var(--muted);
         display: flex;
@@ -609,6 +620,7 @@
           >
         </a>
         <div class="top-header-right">
+          <a href="https://docs.tuibookie.dev" class="top-header-docs">Docs</a>
           <span class="top-header-version"
             ><!--VERSION-->v1.6.0<!--/VERSION--></span
           >
@@ -644,6 +656,7 @@
           <p style="font-size: 14px; color: var(--help); margin-bottom: 24px">
             <!--VERSION-->v1.6.0<!--/VERSION-->
             · Available for macOS and Linux
+            · <a href="https://docs.tuibookie.dev" style="color: var(--green); text-decoration: none;">Read the docs</a>
           </p>
           <div class="install-cmd">
             <span style="color: var(--help)">$</span>
@@ -863,6 +876,9 @@
             </div>
           </div>
         </div>
+        <p style="text-align: center; margin-top: 32px;">
+          <a href="https://docs.tuibookie.dev/usage/" style="color: var(--green); text-decoration: none; font-size: 15px;">Explore the full docs &rarr;</a>
+        </p>
       </section>
 
       <!-- Why TuiBookie -->
@@ -1050,6 +1066,7 @@
       <footer>
         Made in Denmark
         &middot; MIT Licensed
+        &middot; <a href="https://docs.tuibookie.dev" style="color: var(--muted); text-decoration: none;">Documentation</a>
       </footer>
     </div>
 
