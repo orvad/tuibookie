@@ -1,13 +1,16 @@
 .claude/
 .superpowers/
 *-backup-*.json
-docs/
+claude_docs/
 bookmark*.json
 *.log
 *.tmp
 *.cache
 *.bak
 tuibookie
+
+# zensical build output
+site/
 
 # wrangler files
 .wrangler
