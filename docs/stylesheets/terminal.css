@@ -1,0 +1,128 @@
+/* Terminal mockup styles — matches the tuibookie.dev website */
+:root {
+  --tb-bg: #2d2a2e;
+  --tb-surface: #383539;
+  --tb-text: #f8f8f2;
+  --tb-accent: #f92672;
+  --tb-green: #a6e22e;
+  --tb-muted: #a59f85;
+  --tb-help: #75715e;
+  --tb-terminal-bg: #1a1a1a;
+  --tb-border: #3e3d40;
+  --tb-yellow: #e6db74;
+  --tb-orange: #c87a1a;
+  --tb-mono: "SF Mono", "Fira Code", "Cascadia Code", "JetBrains Mono", monospace;
+}
+
+.terminal {
+  background: var(--tb-terminal-bg);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--tb-border);
+  max-width: 560px;
+  margin: 16px auto;
+}
+
+.terminal-bar {
+  background: var(--tb-surface);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.terminal-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.terminal-dot.red { background: var(--tb-accent); }
+.terminal-dot.yellow { background: var(--tb-yellow); }
+.terminal-dot.green { background: var(--tb-green); }
+
+.terminal-body {
+  padding: 4px;
+}
+
+.tui {
+  background: var(--tb-terminal-bg);
+  padding: 16px 20px;
+  font-family: var(--tb-mono);
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--tb-muted);
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.tui-badge {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.tui-badge .tui-title-prefix {
+  color: #c0bdb8;
+  font-weight: bold;
+}
+
+.tui-badge .tui-title-name {
+  color: var(--tb-accent);
+  font-weight: bold;
+}
+
+.tui-badge .tui-title-ver {
+  color: var(--tb-help);
+}
+
+.tui-sep {
+  color: var(--tb-help);
+  margin-bottom: 12px;
+  letter-spacing: -1px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.tui-heading {
+  color: var(--tb-green);
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.tui-section-label {
+  color: var(--tb-help);
+}
+
+.tui-selected {
+  color: var(--tb-green);
+}
+
+.tui-cmd {
+  color: var(--tb-help);
+  margin-left: 2px;
+}
+
+.tui-param {
+  color: var(--tb-orange);
+}
+
+.tui-confirm-indicator {
+  color: var(--tb-accent);
+  font-weight: bold;
+}
+
+.tui-help {
+  color: var(--tb-help);
+  font-size: 11px;
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.tui-help span {
+  color: var(--tb-yellow);
+}

@@ -6,7 +6,13 @@ Organize your frequently used commands into categories, browse them with an intu
 
 ## Why TuiBookie?
 
-If you find yourself scrolling through shell history or keeping notes of complex CLI commands, TuiBookie gives you a better way. Bookmark any command, organize it into categories, and run it instantly from a clean terminal UI.
+Tired of scrolling through shell history to find that one SSH command? TuiBookie was born from a simple frustration: **too many servers, too many commands, no good way to organize them in the terminal.**
+
+Built originally as an **SSH bookmark manager** (called *go-ssh*), TuiBookie grew into a general-purpose CLI command organizer. Save any command -- SSH connections, Docker workflows, kubectl operations, deployment scripts -- and run them instantly from a clean, keyboard-driven interface.
+
+Ever wanted to share complex CLI commands with your team? With TuiBookie you can -- sync shared bookmarks through any git repo and keep everyone on the same page.
+
+**No browser. No GUI. Just your terminal, organized.**
 
 ## Key Features
 
@@ -21,7 +27,9 @@ If you find yourself scrolling through shell history or keeping notes of complex
 
 ## Built With
 
-Built with the [Charm](https://charm.sh/) ecosystem:
+TuiBookie is written in [Go](https://go.dev/) and compiles to a **single, self-contained binary** -- no runtime, no dependencies, no package manager required. Download it, put it in your PATH, and it just works. This makes it easy to install on remote servers, air-gapped machines, or anywhere you don't want to manage a toolchain.
+
+The terminal interface is built with the [Charm](https://charm.sh/) ecosystem:
 
 - [Bubble Tea](https://github.com/charmbracelet/bubbletea) -- TUI framework
 - [Huh](https://github.com/charmbracelet/huh) -- Interactive forms
