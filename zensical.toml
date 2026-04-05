@@ -34,7 +34,7 @@ site_url = "https://docs.tuibookie.dev/"
 #
 # Read more: https://zensical.org/docs/setup/basics/#copyright
 copyright = """
-Copyright &copy; 2026 orvad
+Copyright &copy; 2026 Martin Orvad
 """
 
 repo_url = "https://github.com/orvad/tuibookie"
@@ -53,9 +53,9 @@ nav = [
   { "Usage" = "usage.md" },
   { "Features" = [
     { "Parameterized Commands" = "features/parameterized-commands.md" },
+    { "Gist Sync" = "features/gist-sync.md" },
     { "Confirm Before Execute" = "features/confirm-before-execute.md" },
     { "Shared Bookmarks" = "features/shared-bookmarks.md" },
-    { "Gist Sync" = "features/gist-sync.md" },
     { "Import & Export" = "features/import-export.md" },
   ]},
   { "Configuration" = "configuration.md" },
@@ -70,7 +70,7 @@ nav = [
 #
 # Read more: https://zensical.org/docs/customization/#additional-css
 #
-#extra_css = ["stylesheets/extra.css"]
+extra_css = ["stylesheets/terminal.css"]
 
 # With the `extra_javascript` option you can add your own JavaScript to your
 # project to customize the behavior according to your needs.
