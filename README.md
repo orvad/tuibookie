@@ -213,3 +213,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to get started.
 ## License
 
 MIT
+
+## Support
+
+<a href="https://www.buymeacoffee.com/orvad" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" width="180" ></a>
+
+**Why buy me a coffee?** — TuiBookie is free and open-source, built and maintained in my spare time. If it saves you a few keystrokes, a coffee is always appreciated :heart:
