@@ -56,6 +56,7 @@ nav = [
     { "Gist Sync" = "features/gist-sync.md" },
     { "Confirm Before Execute" = "features/confirm-before-execute.md" },
     { "Shared Bookmarks" = "features/shared-bookmarks.md" },
+    { "Shell History" = "features/shell-history.md" },
     { "Import & Export" = "features/import-export.md" },
   ]},
   { "Configuration" = "configuration.md" },

@@ -4,11 +4,11 @@ Commands executed through TuiBookie can appear in your shell history, so pressin
 
 ## How It Works
 
-After executing a command, TuiBookie writes it to `~/.config/tuibookie/lastcmd`. A small shell wrapper function reads this file and adds the command to your shell's live history.
+After executing a command, TuiBookie writes it to `~/.config/tuibookie/lastcmd`. A shell wrapper function reads this file and adds the command to your shell's live history session.
 
 ## Setup
 
-Add the appropriate function to your shell configuration file and restart your shell (or `source` the file).
+Add the appropriate function to your shell configuration file and restart your shell (or `source` the file). TuiBookie doesn't manage shell history itself -- the wrapper function handles the integration.
 
 ### Zsh
 
