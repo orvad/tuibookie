@@ -269,6 +269,7 @@ func (m Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.currentView = bookmarkView
 			parts := strings.Fields(resolved)
 			if len(parts) > 0 {
+				m.executedCmd = resolved
 				c := exec.Command(parts[0], parts[1:]...)
 				return m, tea.ExecProcess(c, func(err error) tea.Msg {
 					return execDoneMsg{err: err}

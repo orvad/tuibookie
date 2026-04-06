@@ -58,6 +58,6 @@ end
 
 ## Notes
 
-- The wrapper only affects history when a command was actually executed -- if you quit TuiBookie without running anything, nothing is added
-- Commands with resolved parameters (e.g., `ssh admin@prod-server`) are stored, not the original template
-- If you use a custom config directory via `TUIBOOKIE_CONFIG` or the `-config` flag, the `lastcmd` file is still written to `~/.config/tuibookie/lastcmd`
+- The wrapper only affects history when a command was actually executed. If you quit TuiBookie without running anything, nothing is added.
+- Commands with resolved parameters (e.g., `ssh admin@prod-server`) are stored, not the original template.
+- If you use a custom config directory via `TUIBOOKIE_CONFIG` or the `-config` flag, the `lastcmd` file is still written to `~/.config/tuibookie/lastcmd`.
