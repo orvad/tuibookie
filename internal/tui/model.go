@@ -107,6 +107,12 @@ type Model struct {
 	sharedCloneDir   string
 	isSharedContext  bool
 	syncing          bool
+	executedCmd      string
+}
+
+// ExecutedCmd returns the resolved command that was executed, if any.
+func (m Model) ExecutedCmd() string {
+	return m.executedCmd
 }
 
 func NewModel(bm bookmark.Bookmarks, configPath string, configDir string, pathSource PathSource, version string) Model {

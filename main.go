@@ -69,8 +69,17 @@ func main() {
 	model := tui.NewModel(bm, configPath, configDir, pathSource, version)
 	p := tea.NewProgram(model)
 
-	if _, err := p.Run(); err != nil {
+	m, err := p.Run()
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
+	}
+
+	// Write last executed command to file for shell history integration
+	lastCmdPath := filepath.Join(configDir, "lastcmd")
+	if final, ok := m.(tui.Model); ok && final.ExecutedCmd() != "" {
+		os.WriteFile(lastCmdPath, []byte(final.ExecutedCmd()), 0600)
+	} else {
+		os.Remove(lastCmdPath)
 	}
 }

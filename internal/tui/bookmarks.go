@@ -4,8 +4,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"charm.land/huh/v2"
 	tea "charm.land/bubbletea/v2"
+	"charm.land/huh/v2"
 
 	"github.com/orvad/tuibookie/internal/bookmark"
 )
@@ -73,6 +73,7 @@ func (m Model) updateBookmark(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 				parts := strings.Fields(cmd)
 				if len(parts) > 0 {
+					m.executedCmd = cmd
 					c := exec.Command(parts[0], parts[1:]...)
 					return m, tea.ExecProcess(c, func(err error) tea.Msg {
 						return execDoneMsg{err: err}
