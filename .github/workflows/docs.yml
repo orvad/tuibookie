@@ -29,7 +29,7 @@ jobs:
         run: |
           cat > site/_headers << 'EOF'
           /*
-            Cache-Control: public, max-age=0, must-revalidate
+            Cache-Control: public, max-age=600, must-revalidate
           /assets/*
             Cache-Control: public, max-age=31536000, immutable
           EOF
