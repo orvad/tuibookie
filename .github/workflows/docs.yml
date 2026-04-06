@@ -25,6 +25,15 @@ jobs:
 
       - run: zensical build --clean
 
+      - name: Add cache headers
+        run: |
+          cat > site/_headers << 'EOF'
+          /*
+            Cache-Control: public, max-age=600, must-revalidate
+          /assets/*
+            Cache-Control: public, max-age=31536000, immutable
+          EOF
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
