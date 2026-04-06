@@ -29,7 +29,7 @@ Use arrow keys to navigate and Enter to select.
     <div class="tui">
       <div class="tui-badge">
         <span class="tui-title-prefix">Tui</span><span class="tui-title-name">Bookie</span>
-        <span class="tui-title-ver">v1.6.0</span>
+        <span class="tui-title-ver">v1.7.1</span>
       </div>
       <div class="tui-sep">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
       <div class="tui-selected">&gt; Deployments (3)</div>
@@ -59,7 +59,7 @@ Use arrow keys to navigate and Enter to select.
     <div class="tui">
       <div class="tui-badge">
         <span class="tui-title-prefix">Tui</span><span class="tui-title-name">Bookie</span>
-        <span class="tui-title-ver">v1.6.0</span>
+        <span class="tui-title-ver">v1.7.1</span>
       </div>
       <div class="tui-sep">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
       <div class="tui-heading">Kubernetes</div>
@@ -96,7 +96,7 @@ Use arrow keys to navigate and Enter to select.
     <div class="tui">
       <div class="tui-badge">
         <span class="tui-title-prefix">Tui</span><span class="tui-title-name">Bookie</span>
-        <span class="tui-title-ver">v1.6.0</span>
+        <span class="tui-title-ver">v1.7.1</span>
       </div>
       <div class="tui-sep">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
       <div class="tui-heading">Settings</div>
