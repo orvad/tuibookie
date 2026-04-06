@@ -23,7 +23,7 @@ Bookmarks with confirmation enabled are easy to spot -- notice the <span class="
     <div class="tui">
       <div class="tui-badge">
         <span class="tui-title-prefix">Tui</span><span class="tui-title-name">Bookie</span>
-        <span class="tui-title-ver">v1.7.1</span>
+        <span class="tui-title-ver">v1.7.2</span>
       </div>
       <div class="tui-sep">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
       <div class="tui-heading">LOCAL COMMANDS</div>
@@ -50,7 +50,7 @@ When you select a confirmed bookmark, you'll see the command and must choose Yes
     <div class="tui">
       <div class="tui-badge">
         <span class="tui-title-prefix">Tui</span><span class="tui-title-name">Bookie</span>
-        <span class="tui-title-ver">v1.7.1</span>
+        <span class="tui-title-ver">v1.7.2</span>
       </div>
       <div class="tui-sep">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
       <div style="color: #f8f8f2">Execute: rm -rf important_stuff?</div>
